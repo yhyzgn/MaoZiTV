@@ -20,5 +20,5 @@
         <item name="android:textColorPrimary">@android:color/white</item>
     </style>
 
-    <style name="Theme.ThankTV" parent="AppTheme" />
+    <style name="Theme.MaoZiTV" parent="AppTheme" />
 </resources>

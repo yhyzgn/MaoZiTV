@@ -2,9 +2,9 @@ pluginManagement {
     repositories {
         google()
         mavenCentral()
-        gradlePluginPortal()
         maven { url 'https://jitpack.io' }
         maven { url "https://maven.aliyun.com/repository/public" }
+        gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {
@@ -16,5 +16,5 @@ dependencyResolutionManagement {
         maven { url "https://maven.aliyun.com/repository/public" }
     }
 }
-rootProject.name = "ThankTV"
+rootProject.name = "MaoZiTV"
 include ':app'

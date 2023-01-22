@@ -1,16 +1,16 @@
-package com.yhy.thank.tv;
+package com.yhy.mz.tv;
 
 import androidx.multidex.MultiDexApplication;
 
-import com.google.gson.Gson;
 import com.shuyu.gsyvideoplayer.cache.CacheFactory;
-import com.shuyu.gsyvideoplayer.cache.ProxyCacheManager;
-import com.shuyu.gsyvideoplayer.player.IjkPlayerManager;
 import com.shuyu.gsyvideoplayer.player.PlayerFactory;
 import com.shuyu.gsyvideoplayer.utils.GSYVideoType;
 import com.yhy.router.BuildConfig;
 import com.yhy.router.EasyRouter;
 import com.yhy.router.common.JsonConverter;
+import com.yhy.mz.tv.utils.JsonUtils;
+import com.yhy.mz.tv.utils.ToastUtils;
+import com.yhy.mz.tv.utils.ViewUtils;
 
 import java.lang.reflect.Type;
 
@@ -36,21 +36,23 @@ public class App extends MultiDexApplication {
     }
 
     private void init() {
+        // 工具类
+        ToastUtils.init(this);
+        ViewUtils.init(this);
+
         // 路由组件
         EasyRouter.getInstance()
                 .init(this)
                 .debug(BuildConfig.DEBUG)
                 .jsonParser(new JsonConverter() {
-                    final Gson gson = new Gson();
-
                     @Override
                     public <T> T fromJson(String json, Type type) {
-                        return gson.fromJson(json, type);
+                        return JsonUtils.fromJson(json, type);
                     }
 
                     @Override
                     public <T> String toJson(T obj) {
-                        return gson.toJson(obj);
+                        return JsonUtils.toJson(obj);
                     }
                 });
 

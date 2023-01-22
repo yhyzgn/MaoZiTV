@@ -1,13 +1,15 @@
-package com.yhy.thank.tv.component.base;
+package com.yhy.mz.tv.component.base;
 
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.yhy.mz.tv.App;
 
 /**
  * Activity 基类
@@ -20,15 +22,25 @@ import androidx.appcompat.app.AppCompatActivity;
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
+    public App mApp;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        mApp = (App) getApplication();
+
         beforeLayout();
         setContentView(layout());
+
+        initView();
+        initData();
+        initEvent();
     }
 
-    protected void beforeLayout(){}
+    protected void beforeLayout() {
+    }
 
     @LayoutRes
     protected abstract int layout();
