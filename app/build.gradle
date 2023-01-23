@@ -52,7 +52,7 @@ dependencies {
     implementation 'com.squareup.okio:okio:3.3.0'
 
     // 加载动画
-    implementation 'com.github.ybq:Android-SpinKit:1.4.0'
+    implementation project(':loading')
 
     // SweetDialog
     implementation 'com.github.thomper:sweet-alert-dialog:1.4.0'

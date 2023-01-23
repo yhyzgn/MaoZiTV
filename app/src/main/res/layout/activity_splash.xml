@@ -4,15 +4,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <com.github.ybq.android.spinkit.SpinKitView
-            android:id="@+id/skv_loading"
-            style="@style/SpinKitView.Small.CubeGrid"
+    <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/ll_loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            app:SpinKit_Color="@color/colorPrimary"
+            android:orientation="vertical"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center">
+
+        <com.yhy.widget.loading.AVLoadingIndicatorView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                style="@style/AVLoadingIndicatorView"
+                android:layout_centerHorizontal="true"
+                app:indicatorColor="@color/colorPrimary"
+                app:indicatorName="BallSpinFadeLoaderIndicator" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="加载中"
+                android:textSize="6dp"
+                android:textColor="@color/colorWhite" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.constraintlayout.widget.ConstraintLayout>

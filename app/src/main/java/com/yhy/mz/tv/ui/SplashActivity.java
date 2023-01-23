@@ -2,13 +2,14 @@ package com.yhy.mz.tv.ui;
 
 import android.annotation.SuppressLint;
 
-import com.github.ybq.android.spinkit.SpinKitView;
-import com.yhy.router.EasyRouter;
-import com.yhy.router.annotation.Router;
+import androidx.appcompat.widget.LinearLayoutCompat;
+
 import com.yhy.mz.tv.R;
 import com.yhy.mz.tv.component.base.BaseActivity;
 import com.yhy.mz.tv.component.router.FinishRouterCallback;
 import com.yhy.mz.tv.source.SourceCenter;
+import com.yhy.router.EasyRouter;
+import com.yhy.router.annotation.Router;
 
 /**
  * 闪屏页
@@ -23,7 +24,7 @@ import com.yhy.mz.tv.source.SourceCenter;
 @Router(url = "/activity/splash")
 public class SplashActivity extends BaseActivity {
 
-    private SpinKitView skvLoading;
+    private LinearLayoutCompat llLoading;
 
     @Override
     protected int layout() {
@@ -32,7 +33,7 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        skvLoading = $(R.id.skv_loading);
+        llLoading = $(R.id.ll_loading);
     }
 
     @Override
@@ -41,7 +42,7 @@ public class SplashActivity extends BaseActivity {
         SourceCenter.instance.init();
 
         // 进入主页
-        skvLoading.postDelayed(() -> {
+        llLoading.postDelayed(() -> {
             EasyRouter.getInstance()
                     .with(this)
                     .to("/activity/main")

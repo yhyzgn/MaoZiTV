@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  */
 @Router(url = "/activity/main")
 public class MainActivity extends BaseActivity {
-    private static final String[] TOP_TOP = new String[]{"搜索", "观看历史", "收藏夹"};
+    private static final String[] TOP_TOP = new String[]{"搜索", "历史", "收藏", "设置"};
 
     private TabHorizontalGridView hgTop;
     private ArrayObjectAdapter mHgTopAdapter;
