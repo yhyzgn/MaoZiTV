@@ -7,5 +7,7 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorBlack">#000000</color>
     <color name="colorBlue">#ff26b5ff</color>
+    <color name="colorLine">#758A9095</color>
+    <color name="colorGreen">#41AC52</color>
     <color name="white_8_percent">#14FFFFFF</color>
 </resources>

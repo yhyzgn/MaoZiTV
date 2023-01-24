@@ -1,6 +1,6 @@
 package com.yhy.mz.tv.source;
 
-import com.yhy.mz.tv.model.VideoInfo;
+import com.yhy.mz.tv.model.Video;
 import com.yhy.mz.tv.model.ems.VideoType;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public interface Source {
      * @param page 页码，从 1 开始
      * @return 视频信息
      */
-    List<VideoInfo> page(VideoType type, int page);
+    List<Video> page(VideoType type, int page);
 
     /**
      * 搜索
@@ -38,5 +38,5 @@ public interface Source {
      * @param keyword 关键字
      * @return 视频信息
      */
-    List<VideoInfo> search(String keyword);
+    List<Video> search(String keyword);
 }

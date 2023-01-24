@@ -47,7 +47,7 @@ public class SplashActivity extends BaseActivity {
                     .with(this)
                     .to("/activity/main")
                     .go(FinishRouterCallback.get(this));
-        }, 1200);
+        }, 300);
     }
 
     @Override

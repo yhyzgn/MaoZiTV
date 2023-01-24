@@ -15,13 +15,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:gravity="center">
 
-        <com.yhy.widget.loading.AVLoadingIndicatorView
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                style="@style/AVLoadingIndicatorView"
-                android:layout_centerHorizontal="true"
-                app:indicatorColor="@color/colorPrimary"
-                app:indicatorName="BallSpinFadeLoaderIndicator" />
+        <ProgressBar
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:indeterminate="false"
+                android:indeterminateTint="@color/colorPrimary" />
 
         <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="wrap_content"

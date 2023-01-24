@@ -51,8 +51,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.2'
     implementation 'com.squareup.okio:okio:3.3.0'
 
-    // 加载动画
-    implementation project(':loading')
+    // Picasso
+    implementation 'com.squareup.picasso:picasso:2.8'
 
     // SweetDialog
     implementation 'com.github.thomper:sweet-alert-dialog:1.4.0'

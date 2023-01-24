@@ -1,6 +1,6 @@
 package com.yhy.mz.tv.source.internal;
 
-import com.yhy.mz.tv.model.VideoInfo;
+import com.yhy.mz.tv.model.Video;
 import com.yhy.mz.tv.model.ems.VideoType;
 import com.yhy.mz.tv.source.Source;
 
@@ -22,12 +22,12 @@ public class IQiYi implements Source {
     }
 
     @Override
-    public List<VideoInfo> page(VideoType type, int page) {
+    public List<Video> page(VideoType type, int page) {
         return null;
     }
 
     @Override
-    public List<VideoInfo> search(String keyword) {
+    public List<Video> search(String keyword) {
         return null;
     }
 
