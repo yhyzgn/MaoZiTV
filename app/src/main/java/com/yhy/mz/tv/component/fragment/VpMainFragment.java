@@ -19,14 +19,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.yhy.mz.tv.R;
-import com.yhy.mz.tv.api.yi.YiApi;
+import com.yhy.mz.tv.channel.ChannelManager;
 import com.yhy.mz.tv.component.base.BaseLazyLoadFragment;
 import com.yhy.mz.tv.component.presenter.PageVideoPresenter;
 import com.yhy.mz.tv.model.Video;
 import com.yhy.mz.tv.model.ems.Chan;
 import com.yhy.mz.tv.ui.MainActivity;
 import com.yhy.mz.tv.utils.LogUtils;
-import com.yhy.mz.tv.utils.ToastUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
 import com.yhy.mz.tv.widget.TabVerticalGridView;
 
@@ -55,24 +54,22 @@ public class VpMainFragment extends BaseLazyLoadFragment {
         @Override
         public void handleMessage(@NonNull Message msg) {
             List<Video> list = (List<Video>) msg.obj;
-            ToastUtils.shortT(list.size() + "");
-            LogUtils.iTag(TAG, "撒东莞市东莞市", list);
-
-            mAdapter.addAll(0, list);
-            hgContent.setVisibility(View.VISIBLE);
-            pbLoading.setVisibility(View.GONE);
+            if (null != list && !list.isEmpty()) {
+                mAdapter.addAll(0, list);
+                hgContent.setVisibility(View.VISIBLE);
+                pbLoading.setVisibility(View.GONE);
+            }
         }
     };
 
     private final Thread mThread = new Thread(() -> {
         try {
-            List<Video> list = YiApi.instance.page(1, 1, 11);
-
+            List<Video> list = ChannelManager.instance.getChannel(Chan.parse(mCurrentChanCode)).page(1);
             Message msg = new Message();
             msg.what = 1;
             msg.obj = list;
 
-            mHandler.sendMessageDelayed(msg, 800);
+            mHandler.sendMessageDelayed(msg, 200);
         } catch (Exception e) {
             LogUtils.eTag(TAG, e.getMessage());
         }

@@ -1,5 +1,8 @@
 package com.yhy.mz.tv.model.ems;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Created on 2023-01-23 23:24
  *
@@ -31,5 +34,9 @@ public enum Chan {
 
     public String getName() {
         return name;
+    }
+
+    public static Chan parse(int code) {
+        return Arrays.stream(Chan.values()).filter(it -> Objects.equals(it.code, code)).findFirst().orElse(RECOMMEND);
     }
 }

@@ -19,6 +19,8 @@ import com.shuyu.gsyvideoplayer.utils.GSYVideoType;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.yhy.mz.tv.api.RandHeaderInterceptor;
+import com.yhy.mz.tv.rand.IpRand;
+import com.yhy.mz.tv.rand.UserAgentRand;
 import com.yhy.mz.tv.utils.ImgUtils;
 import com.yhy.mz.tv.utils.JsonUtils;
 import com.yhy.mz.tv.utils.LogUtils;
@@ -168,6 +170,8 @@ public class App extends MultiDexApplication {
 
         // 全局请求头
         HttpHeaders headers = new HttpHeaders();
+        headers.put("User-Agent", UserAgentRand.get());
+        headers.put("X-Forwarded-For", IpRand.get());
 
         OkGo.getInstance()
                 .init(this)                               // 必须调用初始化

@@ -23,7 +23,7 @@ public class RecommendChannel implements Channel {
     }
 
     @Override
-    public List<Video> load(VideoType type, int page) {
+    public List<Video> page(int page) {
         return null;
     }
 }

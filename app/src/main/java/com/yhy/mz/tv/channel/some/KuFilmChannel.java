@@ -1,5 +1,6 @@
 package com.yhy.mz.tv.channel.some;
 
+import com.yhy.mz.tv.api.ku.KuApi;
 import com.yhy.mz.tv.channel.Channel;
 import com.yhy.mz.tv.model.Video;
 import com.yhy.mz.tv.model.ems.Chan;
@@ -23,7 +24,11 @@ public class KuFilmChannel implements Channel {
     }
 
     @Override
-    public List<Video> load(VideoType type, int page) {
-        return null;
+    public List<Video> page(int page) {
+        try {
+            return KuApi.instance.page(page, VideoType.FILM, 11);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -4,7 +4,6 @@ import com.yhy.mz.tv.component.base.BaseLazyLoadFragment;
 import com.yhy.mz.tv.component.fragment.VpMainFragment;
 import com.yhy.mz.tv.model.Video;
 import com.yhy.mz.tv.model.ems.Chan;
-import com.yhy.mz.tv.model.ems.VideoType;
 
 import java.util.List;
 
@@ -29,11 +28,10 @@ public interface Channel {
     /**
      * 加载数据
      *
-     * @param type 视频类型
      * @param page 分页页码
      * @return 影视数据
      */
-    List<Video> load(VideoType type, int page);
+    List<Video> page(int page);
 
     /**
      * 创建页面
