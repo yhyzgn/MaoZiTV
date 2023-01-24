@@ -24,7 +24,7 @@ public class PageVideoPresenter extends Presenter {
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video_list, parent, false);
-        return new TabChanPresenter.ViewHolder(view);
+        return new PageVideoPresenter.ViewHolder(view);
     }
 
     @Override

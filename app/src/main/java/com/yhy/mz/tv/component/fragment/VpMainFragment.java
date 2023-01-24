@@ -2,6 +2,8 @@ package com.yhy.mz.tv.component.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +19,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.yhy.mz.tv.R;
+import com.yhy.mz.tv.api.yi.YiApi;
 import com.yhy.mz.tv.component.base.BaseLazyLoadFragment;
 import com.yhy.mz.tv.component.presenter.PageVideoPresenter;
+import com.yhy.mz.tv.model.Video;
 import com.yhy.mz.tv.model.ems.Chan;
 import com.yhy.mz.tv.ui.MainActivity;
+import com.yhy.mz.tv.utils.LogUtils;
+import com.yhy.mz.tv.utils.ToastUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
 import com.yhy.mz.tv.widget.TabVerticalGridView;
+
+import java.util.List;
 
 /**
  * Created on 2023-01-24 01:19
@@ -41,6 +49,34 @@ public class VpMainFragment extends BaseLazyLoadFragment {
     private TabVerticalGridView hgContent;
     private int mCurrentTabPosition;
     private int mCurrentChanCode;
+    private ArrayObjectAdapter mAdapter;
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            List<Video> list = (List<Video>) msg.obj;
+            ToastUtils.shortT(list.size() + "");
+            LogUtils.iTag(TAG, "撒东莞市东莞市", list);
+
+            mAdapter.addAll(0, list);
+            hgContent.setVisibility(View.VISIBLE);
+            pbLoading.setVisibility(View.GONE);
+        }
+    };
+
+    private final Thread mThread = new Thread(() -> {
+        try {
+            List<Video> list = YiApi.instance.page(1, 1, 11);
+
+            Message msg = new Message();
+            msg.what = 1;
+            msg.obj = list;
+
+            mHandler.sendMessageDelayed(msg, 800);
+        } catch (Exception e) {
+            LogUtils.eTag(TAG, e.getMessage());
+        }
+    });
 
     private final RecyclerView.OnScrollListener onScrollListener = new RecyclerView.OnScrollListener() {
         @Override
@@ -70,7 +106,6 @@ public class VpMainFragment extends BaseLazyLoadFragment {
             Log.e(TAG, "onChildViewHolderSelected: " + "　isPressUp:" + hgContent.isPressUp() + " isPressDown:" + hgContent.isPressDown());
         }
     };
-    private ArrayObjectAdapter mAdapter;
 
     public static VpMainFragment newInstance(int position, Chan chan) {
         Bundle args = new Bundle();
@@ -129,29 +164,16 @@ public class VpMainFragment extends BaseLazyLoadFragment {
 
     @Override
     public void fetchData() {
+        loadData();
     }
-
-//    private void addFooter() {
-//        addWithTryCatch(new Footer());
-//    }
-
-//    private void addWithTryCatch(Object item) {
-//        try {
-//            if (!hgContent.isComputingLayout()) {
-//                mAdapter.add(item);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     private void initView() {
         pbLoading = mRootView.findViewById(R.id.pb_loading);
         hgContent = mRootView.findViewById(R.id.hg_content);
         hgContent.setTabView(mActivity.getHgTitle());
-        hgContent.setNumColumns(4);
-        hgContent.setHorizontalSpacing(ViewUtils.dp2px(8));
-        hgContent.setVerticalSpacing(ViewUtils.dp2px(8));
+        hgContent.setNumColumns(6);
+        hgContent.setHorizontalSpacing(ViewUtils.dp2px(5));
+        hgContent.setVerticalSpacing(ViewUtils.dp2px(1));
         PageVideoPresenter presenter = new PageVideoPresenter();
         mAdapter = new ArrayObjectAdapter(presenter);
         ItemBridgeAdapter itemBridgeAdapter = new ItemBridgeAdapter(mAdapter);
@@ -166,6 +188,7 @@ public class VpMainFragment extends BaseLazyLoadFragment {
     private void loadData() {
         pbLoading.setVisibility(View.VISIBLE);
         hgContent.setVisibility(View.INVISIBLE);
+        mThread.start();
     }
 
     private void scrollToTop() {

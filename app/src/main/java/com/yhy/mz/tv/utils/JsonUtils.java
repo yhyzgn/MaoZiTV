@@ -3,6 +3,7 @@ package com.yhy.mz.tv.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
 import java.io.Reader;
@@ -27,6 +28,10 @@ public abstract class JsonUtils {
     }
 
     public static <T> T fromJson(String json, Type type) {
+        return GSON.fromJson(json, type);
+    }
+
+    public static <T> T fromJson(String json, TypeToken<T> type) {
         return GSON.fromJson(json, type);
     }
 
