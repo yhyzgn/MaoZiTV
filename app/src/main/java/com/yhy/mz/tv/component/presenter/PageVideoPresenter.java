@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.view.ViewCompat;
 import androidx.leanback.widget.Presenter;
 
 import com.yhy.mz.tv.R;
@@ -24,6 +25,25 @@ public class PageVideoPresenter extends Presenter {
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video_list, parent, false);
+        view.setOnFocusChangeListener((v, hasFocus) -> {
+            AppCompatImageView ivCover = v.findViewById(R.id.iv_cover);
+            if (hasFocus) {
+                // 此处为得到焦点时的处理内容
+                ViewCompat.animate(ivCover)
+                        .scaleX(1.005f)
+                        .scaleY(1.005f)
+                        .translationZ(1.005f)
+                        .start();
+
+            } else {
+                // 此处为失去焦点时的处理内容
+                ViewCompat.animate(ivCover)
+                        .scaleX(1)
+                        .scaleY(1)
+                        .translationZ(1)
+                        .start();
+            }
+        });
         return new PageVideoPresenter.ViewHolder(view);
     }
 

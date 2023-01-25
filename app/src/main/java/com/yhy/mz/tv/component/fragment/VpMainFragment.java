@@ -13,6 +13,8 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.FocusHighlight;
+import androidx.leanback.widget.FocusHighlightHelper;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
@@ -175,6 +177,7 @@ public class VpMainFragment extends BaseLazyLoadFragment {
         mAdapter = new ArrayObjectAdapter(presenter);
         ItemBridgeAdapter itemBridgeAdapter = new ItemBridgeAdapter(mAdapter);
         hgContent.setAdapter(itemBridgeAdapter);
+        FocusHighlightHelper.setupBrowseItemFocusHighlight(itemBridgeAdapter, FocusHighlight.ZOOM_FACTOR_SMALL, false);
     }
 
     private void initListener() {
