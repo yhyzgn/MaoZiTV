@@ -24,11 +24,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.yhy.mz.tv.R;
+import com.yhy.mz.tv.api.fir.FirApi;
 import com.yhy.mz.tv.channel.ChannelManager;
 import com.yhy.mz.tv.component.adapter.ChanContentVPAdapter;
 import com.yhy.mz.tv.component.base.BaseActivity;
 import com.yhy.mz.tv.component.presenter.TabChanPresenter;
 import com.yhy.mz.tv.model.ems.Chan;
+import com.yhy.mz.tv.utils.JsonUtils;
+import com.yhy.mz.tv.utils.LogUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
 import com.yhy.mz.tv.widget.ScaleConstraintLayout;
 import com.yhy.mz.tv.widget.TabHorizontalGridView;
@@ -137,6 +140,18 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
     @Override
     protected void initData() {
         initBroadCast();
+
+        // 新版本检查
+        checkNewVersion();
+    }
+
+    private void checkNewVersion() {
+        FirApi.instance.versionQuery(vi -> {
+            if (null != vi) {
+                // 存在版本信息
+                LogUtils.iTag(TAG, JsonUtils.toJson(vi));
+            }
+        });
     }
 
     private void initBroadCast() {
