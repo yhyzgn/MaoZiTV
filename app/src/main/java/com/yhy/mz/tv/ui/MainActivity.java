@@ -78,7 +78,10 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
         @Override
         public void onChildViewHolderSelected(RecyclerView parent, RecyclerView.ViewHolder child, int position, int subPosition) {
             super.onChildViewHolderSelected(parent, child, position, subPosition);
-            if (child != null & position != mCurrentPageIndex) {
+
+            if (child != null && position != mCurrentPageIndex) {
+                child.itemView.requestFocus();
+
                 Log.e(TAG, "onChildViewHolderSelected: 000 isSkipTabFromViewPager" + isSkipTabFromViewPager);
                 TextView currentTitle = child.itemView.findViewById(R.id.tv_scv_item);
                 if (isSkipTabFromViewPager) {
@@ -99,7 +102,7 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
                     Paint paint = currentTitle.getPaint();
                     if (paint != null) {
                         paint.setFakeBoldText(true);
-                        //viewpager切页标题不刷新，调用invalidate刷新
+                        // viewpager切页标题不刷新，调用invalidate刷新
                         currentTitle.invalidate();
                     }
                 }
@@ -139,8 +142,6 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
         vpContent.setOffscreenPageLimit(2);
         mVpAdapter = new ChanContentVPAdapter(getSupportFragmentManager());
         vpContent.setAdapter(mVpAdapter);
-
-        hgTitle.setSelectedPositionSmooth(1);
     }
 
     @Override
@@ -217,6 +218,8 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
         sclHistory.setOnKeyListener(this);
         sclFavor.setOnKeyListener(this);
         sclSettings.setOnKeyListener(this);
+
+        vpContent.setCurrentItem(1);
     }
 
     @Override
@@ -265,18 +268,15 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
         if (newFocus == null || oldFocus == null) {
             return;
         }
-        if (newFocus.getId() == R.id.tv_scv_item
-                && oldFocus.getId() == R.id.tv_scv_item) {
+        if (newFocus.getId() == R.id.tv_scv_item && oldFocus.getId() == R.id.tv_scv_item) {
             ((TextView) newFocus).setTextColor(getResources().getColor(R.color.colorWhite));
             ((TextView) newFocus).getPaint().setFakeBoldText(true);
             ((TextView) oldFocus).setTextColor(getResources().getColor(R.color.colorWhite));
             ((TextView) oldFocus).getPaint().setFakeBoldText(false);
-        } else if (newFocus.getId() == R.id.tv_scv_item
-                && oldFocus.getId() != R.id.tv_scv_item) {
+        } else if (newFocus.getId() == R.id.tv_scv_item && oldFocus.getId() != R.id.tv_scv_item) {
             ((TextView) newFocus).setTextColor(getResources().getColor(R.color.colorWhite));
             ((TextView) newFocus).getPaint().setFakeBoldText(true);
-        } else if (newFocus.getId() != R.id.tv_scv_item
-                && oldFocus.getId() == R.id.tv_scv_item) {
+        } else if (newFocus.getId() != R.id.tv_scv_item && oldFocus.getId() == R.id.tv_scv_item) {
             ((TextView) oldFocus).setTextColor(getResources().getColor(R.color.colorBlue));
             ((TextView) oldFocus).getPaint().setFakeBoldText(true);
         }
@@ -307,8 +307,7 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
     class NetworkChangeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager connectivityManager =
-                    (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
             if (networkInfo != null && networkInfo.isAvailable()) {
                 switch (networkInfo.getType()) {
