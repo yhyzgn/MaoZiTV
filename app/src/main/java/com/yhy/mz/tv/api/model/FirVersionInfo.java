@@ -28,7 +28,7 @@ public class FirVersionInfo implements Serializable {
      * changelog
      */
     @SerializedName("changelog")
-    public Object changeLog;
+    public String changeLog;
     /**
      * updatedAt
      */

@@ -21,9 +21,11 @@ import com.squareup.picasso.RequestCreator;
 import com.yhy.mz.tv.api.RandHeaderInterceptor;
 import com.yhy.mz.tv.rand.IpRand;
 import com.yhy.mz.tv.rand.UserAgentRand;
+import com.yhy.mz.tv.utils.FileUtils;
 import com.yhy.mz.tv.utils.ImgUtils;
 import com.yhy.mz.tv.utils.JsonUtils;
 import com.yhy.mz.tv.utils.LogUtils;
+import com.yhy.mz.tv.utils.SysUtils;
 import com.yhy.mz.tv.utils.ToastUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
 import com.yhy.router.BuildConfig;
@@ -70,6 +72,8 @@ public class App extends MultiDexApplication {
         // 工具类
         ToastUtils.init(this);
         ViewUtils.init(this);
+        SysUtils.init(this);
+        FileUtils.init(this);
         // Log工具类
         LogUtils.getConfig().setApp(this).setLogSwitch(true).setGlobalTag(getClass().getSimpleName());
         ImgUtils.init(new ImgUtils.ImgLoader() {

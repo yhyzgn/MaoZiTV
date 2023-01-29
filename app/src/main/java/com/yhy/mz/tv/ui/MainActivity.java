@@ -23,15 +23,19 @@ import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.azhon.appupdate.manager.DownloadManager;
 import com.yhy.mz.tv.R;
 import com.yhy.mz.tv.api.fir.FirApi;
+import com.yhy.mz.tv.api.model.FirVersionInfo;
 import com.yhy.mz.tv.channel.ChannelManager;
 import com.yhy.mz.tv.component.adapter.ChanContentVPAdapter;
 import com.yhy.mz.tv.component.base.BaseActivity;
 import com.yhy.mz.tv.component.presenter.TabChanPresenter;
 import com.yhy.mz.tv.model.ems.Chan;
+import com.yhy.mz.tv.utils.FileUtils;
 import com.yhy.mz.tv.utils.JsonUtils;
 import com.yhy.mz.tv.utils.LogUtils;
+import com.yhy.mz.tv.utils.SysUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
 import com.yhy.mz.tv.widget.ScaleConstraintLayout;
 import com.yhy.mz.tv.widget.TabHorizontalGridView;
@@ -135,6 +139,8 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
         vpContent.setOffscreenPageLimit(2);
         mVpAdapter = new ChanContentVPAdapter(getSupportFragmentManager());
         vpContent.setAdapter(mVpAdapter);
+
+        hgTitle.setSelectedPositionSmooth(1);
     }
 
     @Override
@@ -150,8 +156,30 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
             if (null != vi) {
                 // 存在版本信息
                 LogUtils.iTag(TAG, JsonUtils.toJson(vi));
+                long versionCode = SysUtils.getVersionCode();
+                if (versionCode < Long.parseLong(vi.version)) {
+                    // 发现新版本
+                    downloadApk(vi);
+                }
             }
         });
+    }
+
+    private void downloadApk(FirVersionInfo version) {
+        DownloadManager manager = new DownloadManager.Builder(this)
+                .apkName(version.name + "_" + version.versionShort + ".apk")
+                .apkUrl(version.directInstallUrl)
+                .apkDescription(version.changeLog)
+                .smallIcon(R.mipmap.ic_launcher)
+                .apkSize(FileUtils.formatSize(version.binary.fSize))
+                .showNotification(true)
+                .forcedUpgrade(true)
+                .jumpInstallPage(true)
+                .showNewerToast(true)
+                .showBgdToast(true)
+                .build();
+
+        manager.download();
     }
 
     private void initBroadCast() {
