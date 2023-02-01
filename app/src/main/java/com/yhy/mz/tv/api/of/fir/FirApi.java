@@ -1,4 +1,4 @@
-package com.yhy.mz.tv.api.fir;
+package com.yhy.mz.tv.api.of.fir;
 
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.model.Response;

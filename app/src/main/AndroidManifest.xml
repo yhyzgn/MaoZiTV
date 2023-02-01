@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
     <uses-permission
             android:name="android.permission.WRITE_EXTERNAL_STORAGE"
             tools:ignore="ScopedStorage" />
@@ -52,6 +51,17 @@
                 android:name=".ui.MainActivity"
                 android:screenOrientation="landscape" />
 
+        <activity
+                android:name=".ui.DetailActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+                android:screenOrientation="landscape" />
+
+        <service
+                android:name="com.tencent.smtt.export.external.DexClassLoaderProviderService"
+                android:label="dexopt"
+                android:process=":dexopt" >
+        </service>
+
         <uses-library
                 android:name="android.test.runner"
                 android:required="false" />
@@ -61,5 +71,9 @@
         <uses-library
                 android:name="android.test.mock"
                 android:required="false" />
+
+        <meta-data
+                android:name="android.max_aspect"
+                android:value="2.1" />
     </application>
 </manifest>

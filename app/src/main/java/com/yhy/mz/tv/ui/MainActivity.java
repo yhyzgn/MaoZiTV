@@ -25,7 +25,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.azhon.appupdate.manager.DownloadManager;
 import com.yhy.mz.tv.R;
-import com.yhy.mz.tv.api.fir.FirApi;
+import com.yhy.mz.tv.api.of.fir.FirApi;
 import com.yhy.mz.tv.api.model.FirVersionInfo;
 import com.yhy.mz.tv.channel.ChannelManager;
 import com.yhy.mz.tv.component.adapter.ChanContentVPAdapter;
@@ -218,7 +218,10 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
         sclHistory.setOnKeyListener(this);
         sclFavor.setOnKeyListener(this);
         sclSettings.setOnKeyListener(this);
+    }
 
+    @Override
+    protected void setDefault() {
         vpContent.setCurrentItem(1);
     }
 

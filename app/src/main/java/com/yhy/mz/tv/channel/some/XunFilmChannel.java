@@ -1,6 +1,6 @@
 package com.yhy.mz.tv.channel.some;
 
-import com.yhy.mz.tv.api.xun.XunApi;
+import com.yhy.mz.tv.api.of.chan.xun.XunApi;
 import com.yhy.mz.tv.channel.Channel;
 import com.yhy.mz.tv.model.Video;
 import com.yhy.mz.tv.model.ems.Chan;

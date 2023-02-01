@@ -30,6 +30,7 @@ import com.yhy.mz.tv.ui.MainActivity;
 import com.yhy.mz.tv.utils.LogUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
 import com.yhy.mz.tv.widget.TabVerticalGridView;
+import com.yhy.router.EasyRouter;
 
 import java.util.List;
 
@@ -50,6 +51,7 @@ public class VpMainFragment extends BaseLazyLoadFragment {
     private TabVerticalGridView hgContent;
     private int mCurrentTabPosition;
     private int mCurrentChanCode;
+    private PageVideoPresenter mPresenter;
     private ArrayObjectAdapter mAdapter;
 
     private final Handler mHandler = new Handler() {
@@ -170,11 +172,11 @@ public class VpMainFragment extends BaseLazyLoadFragment {
         pbLoading = mRootView.findViewById(R.id.pb_loading);
         hgContent = mRootView.findViewById(R.id.hg_content);
         hgContent.setTabView(mActivity.getHgTitle());
-        hgContent.setNumColumns(6);
+        hgContent.setNumColumns(8);
         hgContent.setHorizontalSpacing(ViewUtils.dp2px(5));
         hgContent.setVerticalSpacing(ViewUtils.dp2px(1));
-        PageVideoPresenter presenter = new PageVideoPresenter();
-        mAdapter = new ArrayObjectAdapter(presenter);
+        mPresenter = new PageVideoPresenter();
+        mAdapter = new ArrayObjectAdapter(mPresenter);
         ItemBridgeAdapter itemBridgeAdapter = new ItemBridgeAdapter(mAdapter);
         hgContent.setAdapter(itemBridgeAdapter);
         FocusHighlightHelper.setupBrowseItemFocusHighlight(itemBridgeAdapter, FocusHighlight.ZOOM_FACTOR_SMALL, false);
@@ -183,6 +185,14 @@ public class VpMainFragment extends BaseLazyLoadFragment {
     private void initListener() {
         hgContent.addOnScrollListener(onScrollListener);
         hgContent.addOnChildViewHolderSelectedListener(onSelectedListener);
+
+        mPresenter.setOnItemClickListener((view, video) -> {
+            EasyRouter.getInstance()
+                    .with(this)
+                    .to("/activity/detail")
+                    .param("mVideo", video)
+                    .go();
+        });
     }
 
     private void loadData() {

@@ -1,4 +1,4 @@
-package com.yhy.mz.tv.api.xun;
+package com.yhy.mz.tv.api.of.chan.xun;
 
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -42,17 +42,33 @@ public class XunApi {
         ListenableFuture<List<Video>> future = new AbstractFuture<List<Video>>() {
             {
                 String pg = (Math.max(1, page) - 1) + "";
-                Map<String, Object> body = Maps.of("page_context", Maps.of("page_index", pg),
+                Map<String, Object> body = Maps.of(
+                        "page_bypass_params", Maps.of(
+                                "abtest_bypass_id", "f5aa0d25e4aa0b62",
+                                "params", Maps.of(
+                                        "caller_id", "3000010",
+                                        "channel_id", "100173",
+                                        "data_mode", "default",
+                                        "filter_params", "itype=-1&iarea=-1&characteristic=-1&year=-1&charge=-1&sort=75",
+                                        "page", pg,
+                                        "page_id", "channel_list_second_page",
+                                        "page_type", "operation",
+                                        "platform_id", "2",
+                                        "user_mode", "default"
+                                ),
+                                "scene", "operation"
+                        ),
+                        "page_context", Maps.of("page_index", pg),
                         "page_params", Maps.of(
                                 "page_id", "channel_list_second_page",
                                 "page_type", "operation",
                                 "channel_id", type == VideoType.FILM ? "100173" : type == VideoType.EPISODE ? "100113" : "100105",
-                                "filter_params", "sort=75",
+                                "filter_params", "itype=-1&iarea=-1&characteristic=-1&year=-1&charge=-1&sort=75",
                                 "page", pg
                         ));
 
-                OkGo.<String>post("https://pbaccess.video.qq.com/com.tencent.qqlive.protocol.pb.VLPageService/getVLPage?video_appid=3000010")
-                        .headers("cookie", "video_platform=2;")
+                OkGo.<String>post("https://pbaccess.video.qq.com/trpc.vector_layout.page_view.PageService/getPage?video_appid=3000010")
+                        .headers("cookie", "tvfe_boss_uuid=77ce84b0af77c334; video_platform=2; video_guid=f5aa0d25e4aa0b62; pgv_pvid=8172569500; pgv_info=ssid=s4222040415")
                         .upJson(gson.toJson(body))
                         .execute(new StringCallback() {
                             @Override
@@ -60,7 +76,7 @@ public class XunApi {
                                 String result = response.body();
                                 try {
                                     JSONObject jo = new JSONObject(result);
-                                    JSONArray ja = jo.getJSONArray("CardList");
+                                    JSONArray ja = jo.getJSONObject("data").getJSONArray("CardList");
                                     jo = ja.getJSONObject(1);
                                     ja = jo.getJSONObject("children_list").getJSONObject("list").getJSONArray("cards");
                                     String json = ja.toString();

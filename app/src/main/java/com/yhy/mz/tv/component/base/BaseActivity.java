@@ -37,6 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         initView();
         initData();
         initEvent();
+        setDefault();
     }
 
     protected void beforeLayout() {
@@ -50,6 +51,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract void initData();
 
     protected abstract void initEvent();
+
+    protected abstract void setDefault();
 
     public <T extends View> T $(@IdRes int id) {
         return findViewById(id);

@@ -53,4 +53,8 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void initEvent() {
     }
+
+    @Override
+    protected void setDefault() {
+    }
 }

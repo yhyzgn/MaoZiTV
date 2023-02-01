@@ -13,11 +13,11 @@ import com.lzy.okgo.cache.CacheEntity;
 import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.lzy.okgo.model.HttpHeaders;
-import com.shuyu.gsyvideoplayer.cache.CacheFactory;
 import com.shuyu.gsyvideoplayer.player.PlayerFactory;
 import com.shuyu.gsyvideoplayer.utils.GSYVideoType;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+import com.tencent.smtt.sdk.QbSdk;
 import com.yhy.mz.tv.api.RandHeaderInterceptor;
 import com.yhy.mz.tv.rand.IpRand;
 import com.yhy.mz.tv.rand.UserAgentRand;
@@ -39,7 +39,6 @@ import java.util.logging.Level;
 
 import okhttp3.OkHttpClient;
 import tv.danmaku.ijk.media.exo2.Exo2PlayerManager;
-import tv.danmaku.ijk.media.exo2.ExoPlayerCacheManager;
 
 /**
  * 应用
@@ -57,6 +56,22 @@ public class App extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        QbSdk.initX5Environment(this, new QbSdk.PreInitCallback() {
+            @Override
+            public void onCoreInitFinished() {
+                // 内核初始化完成，可能为系统内核，也可能为系统内核
+            }
+
+            /**
+             * 预初始化结束
+             * 由于X5内核体积较大，需要依赖网络动态下发，所以当内核不存在的时候，默认会回调false，此时将会使用系统内核代替
+             * @param isX5 是否使用X5内核
+             */
+            @Override
+            public void onViewInitFinished(boolean isX5) {
+
+            }
+        });
 
         init();
     }
@@ -148,9 +163,17 @@ public class App extends MultiDexApplication {
     private void initPlayer() {
         // 播放器
         PlayerFactory.setPlayManager(Exo2PlayerManager.class);
-        CacheFactory.setCacheManager(ExoPlayerCacheManager.class);
+//        CacheFactory.setCacheManager(ExoPlayerCacheManager.class);
         GSYVideoType.setShowType(GSYVideoType.SCREEN_TYPE_16_9);
-        GSYVideoType.setRenderType(GSYVideoType.SUFRACE);
+        GSYVideoType.setScreenScaleRatio(9.0f / 16);
+//        GSYVideoType.setRenderType(GSYVideoType.GLSURFACE);
+        GSYVideoType.enableMediaCodec();
+        GSYVideoType.enableMediaCodecTexture();
+
+//        VideoOptionModel videoOptionModel = new VideoOptionModel(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 50);
+//        List<VideoOptionModel> list = new ArrayList<>();
+//        list.add(videoOptionModel);
+//        GSYVideoManager.instance().setOptionModelList(list);
     }
 
     private void initOkGo() {

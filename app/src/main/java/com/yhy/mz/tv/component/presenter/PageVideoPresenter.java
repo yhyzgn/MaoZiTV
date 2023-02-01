@@ -22,6 +22,9 @@ import com.yhy.mz.tv.utils.ImgUtils;
  */
 public class PageVideoPresenter extends Presenter {
 
+    private static final String TAG = "PageVideoPresenter";
+    private OnItemClickListener mOnItemClickListener;
+
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video_list, parent, false);
@@ -55,11 +58,21 @@ public class PageVideoPresenter extends Presenter {
             ImgUtils.load(viewHolder.view.getContext(), vh.ivCover, vd.imgCover);
             vh.tvScore.setText(vd.score + "");
             vh.tvName.setText(vd.title);
+
+            vh.view.setOnClickListener(v -> {
+                if (null != mOnItemClickListener) {
+                    mOnItemClickListener.onItemClick(v, vd);
+                }
+            });
         }
     }
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mOnItemClickListener = listener;
     }
 
     public static class ViewHolder extends Presenter.ViewHolder {
@@ -74,5 +87,10 @@ public class PageVideoPresenter extends Presenter {
             tvScore = view.findViewById(R.id.tv_score);
             tvName = view.findViewById(R.id.tv_name);
         }
+    }
+
+    public interface OnItemClickListener {
+
+        void onItemClick(View view, Video video);
     }
 }
