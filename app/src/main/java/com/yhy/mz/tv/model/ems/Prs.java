@@ -14,7 +14,9 @@ public enum Prs {
     OK("OK解析", "https://okjx.cc/?url="),
     CK("CK解析", "https://www.ckplayer.vip/jiexi/?url="),
     IM_1907("IM1907", "https://im1907.top/?jx="),
+    YE_MU("夜幕", "https://www.yemu.xyz/?url="),
     JSON_PLAYER("JsonPlayer", "https://jx.jsonplayer.com/player/?url="),
+    M3U8_TV("M3U8.TV", "https://jx.m3u8.tv/jiexi/?url="),
     ;
 
     private final String name;

@@ -38,6 +38,11 @@ android {
     packagingOptions {
         exclude 'META-INF/*'
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -66,18 +71,17 @@ dependencies {
     // SweetDialog
     implementation 'com.github.thomper:sweet-alert-dialog:1.4.0'
 
+//    implementation 'com.github.CarGuo.GSYVideoPlayer:GSYVideoPlayer:v8.3.4-release-jitpack'
 //    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer-java:v8.3.4-release-jitpack'
-//    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer-exo2:v8.3.4-release-jitpack'
-//    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer-aliplay:v8.3.4-release-jitpack'
-//    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer-armv7a:v8.3.4-release-jitpack'
-//    implementation 'com.github.CarGuo.GSYVideoPlayer:gsyVideoPlayer-x86:v8.3.4-release-jitpack'
+//    implementation 'com.github.CarGuo.GSYVideoPlayer:GSYVideoPlayer-exo2:v8.3.4-release-jitpack'
 
-    implementation 'com.github.CarGuo.GSYVideoPlayer:GSYVideoPlayer:v8.3.4-release-jitpack'
-    implementation 'com.github.CarGuo.GSYVideoPlayer:GSYVideoPlayer-aliplay:8.3.4-release-jitpack'
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.2'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.18.2'
 
     implementation 'me.jessyan:autosize:1.2.1'
     implementation 'com.tencent.bugly:crashreport:4.1.9'
     implementation 'com.tencent.bugly:nativecrashreport:3.9.2'
+    implementation 'org.xwalk:xwalk_shared_library:23.53.589.4'
 
     implementation 'com.github.yhyzgn:Evtor:2.0.1'
     implementation 'com.github.yhyzgn.EasyRouter:router:2.0.1'

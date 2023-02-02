@@ -1,10 +1,12 @@
 package com.yhy.mz.tv.parser;
 
-import android.widget.RelativeLayout;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.yhy.evtor.Evtor;
 import com.yhy.evtor.annotation.Subscribe;
+import com.yhy.mz.tv.parser.of.OkParser;
 import com.yhy.mz.tv.parser.of.PanGuParser;
+import com.yhy.mz.tv.parser.of.YeMuParser;
 import com.yhy.mz.tv.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -29,7 +31,9 @@ public class ParserEngine {
     private final Map<String, Integer> mIndexUrlMap = new HashMap<>();
 
     private ParserEngine() {
+        mParserList.add(new YeMuParser());
         mParserList.add(new PanGuParser());
+        mParserList.add(new OkParser());
 
         Evtor.instance.register(this);
     }
@@ -37,17 +41,17 @@ public class ParserEngine {
     public void init() {
     }
 
-    public void process(RelativeLayout rlWvContainer, String url) {
-        process(rlWvContainer, url, 0);
+    public void process(AppCompatActivity activity, String url) {
+        process(activity, url, 0);
     }
 
-    private void process(RelativeLayout rlWvContainer, String url, int index) {
+    public void process(AppCompatActivity activity, String url, int index) {
         if (index > mParserList.size() - 1) {
             throw new IllegalArgumentException("解析器下标越界");
         }
         Parser parser = mParserList.get(index);
         if (null != parser) {
-            parser.process(rlWvContainer, url);
+            parser.process(activity, parser.prs().getUrl() + url);
             mIndexUrlMap.put(url, index);
         }
     }
@@ -59,13 +63,13 @@ public class ParserEngine {
     }
 
     @Subscribe("onWebViewParseError")
-    public void onWebViewParseError(RelativeLayout rlWvContainer, String url) {
+    public void onWebViewParseError(AppCompatActivity activity, String url) {
         LogUtils.eTag(TAG, url, "解析失败了，轮到下一个解析器...");
         Integer index = mIndexUrlMap.get(url);
         if (null == index) {
             index = -1;
         }
         index++;
-        process(rlWvContainer, url, index);
+        process(activity, url, index);
     }
 }

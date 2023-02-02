@@ -1,6 +1,6 @@
 package com.yhy.mz.tv.parser;
 
-import android.widget.RelativeLayout;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.yhy.mz.tv.model.ems.Prs;
 
@@ -23,10 +23,18 @@ public interface Parser {
     Prs prs();
 
     /**
+     * 判断一个 url 是否是视频地址
+     *
+     * @param url 待判定的地址
+     * @return 是否是视频
+     */
+    boolean isVideoUrl(String url);
+
+    /**
      * 解析一个地址
      *
-     * @param rlWvContainer WebView 容器
-     * @param url           视频地址
+     * @param activity 当前 Activity
+     * @param url      视频地址
      */
-    void process(RelativeLayout rlWvContainer, String url);
+    void process(AppCompatActivity activity, String url);
 }

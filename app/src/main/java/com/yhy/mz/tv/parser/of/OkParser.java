@@ -6,25 +6,21 @@ import com.yhy.mz.tv.model.ems.Prs;
 import com.yhy.mz.tv.parser.AbsParser;
 
 /**
- * 盘古解析
- * <p>
- * Created on 2023-01-29 21:39
+ * Created on 2023-02-02 21:45
  *
  * @author 颜洪毅
  * @version 1.0.0
  * @since 1.0.0
  */
-public class PanGuParser extends AbsParser {
-    private static final String TAG = "PanGuParser";
-
+public class OkParser extends AbsParser {
     @Override
     public Prs prs() {
-        return Prs.PAN_GU;
+        return Prs.OK;
     }
 
     @Override
     public boolean isVideoUrl(String url) {
-        return url.contains("/PlayVideo.php?url=") && url.endsWith("=.m3u8");
+        return url.startsWith("https://api.m3u8.pw/Cache") && url.contains(".m3u8?vkey=");
     }
 
     @Override
