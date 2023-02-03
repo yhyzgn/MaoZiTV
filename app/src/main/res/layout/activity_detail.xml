@@ -29,6 +29,20 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <com.google.android.exoplayer2.ui.DefaultTimeBar
+                android:id="@+id/tb_progress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:played_color="@color/colorPrimary"
+                app:bar_height="1dp"
+                app:ad_marker_width="0dp"
+                app:touch_target_height="1dp"
+                app:unplayed_color="@android:color/black"
+                app:buffered_color="@android:color/darker_gray" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

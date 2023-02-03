@@ -12,15 +12,16 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.ui.DefaultTimeBar;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.yhy.evtor.Evtor;
 import com.yhy.evtor.annotation.Subscribe;
 import com.yhy.mz.tv.R;
-import com.yhy.mz.tv.api.of.parser.ParserApi;
 import com.yhy.mz.tv.cache.KV;
 import com.yhy.mz.tv.component.base.BaseActivity;
 import com.yhy.mz.tv.model.Video;
+import com.yhy.mz.tv.parser.ParserEngine;
 import com.yhy.mz.tv.utils.LogUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
 import com.yhy.router.EasyRouter;
@@ -54,6 +55,7 @@ public class DetailActivity extends BaseActivity {
 
     private boolean mIsFullScreen;
     private ConstraintLayout clPlayerContainer;
+    private DefaultTimeBar tbProgress;
 
     @Override
     protected int layout() {
@@ -67,6 +69,7 @@ public class DetailActivity extends BaseActivity {
         clPlayerContainer = $(R.id.cl_player_container);
         pvPlayer = $(R.id.pv_player);
         pbLoading = $(R.id.pb_loading);
+        tbProgress = $(R.id.tb_progress);
 
         //创建一个播放器
         mExoPlayer = new ExoPlayer.Builder(this).build();
@@ -83,13 +86,13 @@ public class DetailActivity extends BaseActivity {
     protected void initData() {
         EasyRouter.getInstance().inject(this);
 
-//        ParserEngine.instance.process(this, mVideo.pageUrl);
+        ParserEngine.instance.process(this, mVideo.pageUrl);
         // 接口获取播放链接
-        ParserApi.instance.danMu(mVideo.pageUrl, url -> {
-//            LogUtils.iTag(TAG, "获取到播放链接：", url);
-            // 播放
-            play(url);
-        });
+//        ParserApi.instance.danMu(mVideo.pageUrl, url -> {
+////            LogUtils.iTag(TAG, "获取到播放链接：", url);
+//            // 播放
+////            play(url);
+//        });
     }
 
     private void play(String url) {
@@ -101,6 +104,10 @@ public class DetailActivity extends BaseActivity {
         mExoPlayer.setMediaItem(mMediaItem, position);
         mExoPlayer.prepare();
         mExoPlayer.play();
+
+        tbProgress.setBufferedPosition(mExoPlayer.getBufferedPosition());
+        tbProgress.setPosition(position);
+        tbProgress.hideScrubber(true);
 
         pvPlayer.postDelayed(() -> performFullScreenOperations(true), 3000);
     }
@@ -130,6 +137,7 @@ public class DetailActivity extends BaseActivity {
                     case Player.STATE_READY:
                         // 准备完成
                         LogUtils.iTag(TAG, "准备完成");
+                        tbProgress.setDuration(mExoPlayer.getDuration());
                         pbLoading.setVisibility(View.GONE);
                         break;
                     case Player.STATE_ENDED:
@@ -174,13 +182,14 @@ public class DetailActivity extends BaseActivity {
             public void run() {
                 runOnUiThread(() -> {
                     long position = mExoPlayer.getCurrentPosition();
-//                    LogUtils.iTag(TAG, "进度变化：", position, "总时长：", mExoPlayer.getDuration());
                     if (position > 0 && null != mVideo) {
+                        tbProgress.setPosition(position);
+                        tbProgress.setBufferedPosition(mExoPlayer.getBufferedPosition());
                         KV.instance.kv().putLong(mVideo.pageUrl, position);
                     }
                 });
             }
-        }, 0, 2);
+        }, 0, 1);
     }
 
     @Override
