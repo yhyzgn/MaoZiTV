@@ -15,6 +15,8 @@ import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.lzy.okgo.model.HttpHeaders;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+import com.tencent.smtt.export.external.TbsCoreSettings;
+import com.tencent.smtt.sdk.QbSdk;
 import com.yhy.mz.tv.api.RandHeaderInterceptor;
 import com.yhy.mz.tv.rand.IpRand;
 import com.yhy.mz.tv.rand.UserAgentRand;
@@ -30,6 +32,8 @@ import com.yhy.router.common.JsonConverter;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -55,6 +59,10 @@ public class App extends MultiDexApplication {
 //            @Override
 //            public void onCoreInitFinished() {
 //                // 内核初始化完成，可能为系统内核，也可能为系统内核
+//                Map<String, Object> map = new HashMap<>();
+//                map.put(TbsCoreSettings.TBS_SETTINGS_USE_SPEEDY_CLASSLOADER, true);
+//                map.put(TbsCoreSettings.TBS_SETTINGS_USE_DEXLOADER_SERVICE, true);
+//                QbSdk.initTbsSettings(map);
 //            }
 //
 //            /**

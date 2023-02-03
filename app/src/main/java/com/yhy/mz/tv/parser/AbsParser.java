@@ -122,7 +122,6 @@ public abstract class AbsParser implements Parser {
         settings.setDatabaseEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setJavaScriptEnabled(true);
-        settings.setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             settings.setMediaPlaybackRequiresUserGesture(false);
@@ -142,11 +141,12 @@ public abstract class AbsParser implements Parser {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         }
-//        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+//        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         /* 添加webView配置 */
         //设置编码
         settings.setDefaultTextEncodingName("utf-8");
+        settings.setUserAgentString("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36");
 //        settings.setUserAgentString(webView.getSettings().getUserAgentString());
         // settings.setUserAgentString(ANDROID_UA);
 
