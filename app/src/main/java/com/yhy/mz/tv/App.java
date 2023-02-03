@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.multidex.MultiDexApplication;
 
 import com.lzy.okgo.OkGo;
@@ -15,9 +16,8 @@ import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.lzy.okgo.model.HttpHeaders;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
-import com.tencent.smtt.export.external.TbsCoreSettings;
-import com.tencent.smtt.sdk.QbSdk;
 import com.yhy.mz.tv.api.RandHeaderInterceptor;
+import com.yhy.mz.tv.cache.KV;
 import com.yhy.mz.tv.rand.IpRand;
 import com.yhy.mz.tv.rand.UserAgentRand;
 import com.yhy.mz.tv.utils.FileUtils;
@@ -32,11 +32,12 @@ import com.yhy.router.common.JsonConverter;
 
 import java.io.File;
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import io.fastkv.FastKV;
+import io.fastkv.FastKVConfig;
 import okhttp3.OkHttpClient;
 
 /**
@@ -81,9 +82,31 @@ public class App extends MultiDexApplication {
 
     private void init() {
         initUtils();
+        initFastKV();
         initRouter();
         initOkGo();
         initPlayer();
+    }
+
+    private void initFastKV() {
+        FastKVConfig.setLogger(new FastKV.Logger() {
+            @Override
+            public void i(@NonNull String name, @NonNull String message) {
+                LogUtils.iTag(name, message);
+            }
+
+            @Override
+            public void w(@NonNull String name, @NonNull Exception e) {
+                LogUtils.wTag(name, e.getMessage());
+            }
+
+            @Override
+            public void e(@NonNull String name, @NonNull Exception e) {
+                LogUtils.eTag(name, e.getMessage());
+            }
+        });
+        FastKVConfig.setExecutor(Executors.newSingleThreadExecutor());
+        KV.instance.init(this);
     }
 
     private void initUtils() {

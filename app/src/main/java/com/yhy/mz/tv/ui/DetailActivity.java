@@ -1,13 +1,11 @@
 package com.yhy.mz.tv.ui;
 
-import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.exoplayer2.ExoPlayer;
@@ -19,14 +17,18 @@ import com.google.android.exoplayer2.util.MimeTypes;
 import com.yhy.evtor.Evtor;
 import com.yhy.evtor.annotation.Subscribe;
 import com.yhy.mz.tv.R;
+import com.yhy.mz.tv.api.of.parser.ParserApi;
+import com.yhy.mz.tv.cache.KV;
 import com.yhy.mz.tv.component.base.BaseActivity;
 import com.yhy.mz.tv.model.Video;
-import com.yhy.mz.tv.parser.ParserEngine;
 import com.yhy.mz.tv.utils.LogUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
 import com.yhy.router.EasyRouter;
 import com.yhy.router.annotation.Autowired;
 import com.yhy.router.annotation.Router;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * 详情页
@@ -43,6 +45,9 @@ public class DetailActivity extends BaseActivity {
 
     @Autowired
     public Video mVideo;
+
+    private Timer mProgressTimer;
+
     private StyledPlayerView pvPlayer;
     private ExoPlayer mExoPlayer;
     private ProgressBar pbLoading;
@@ -51,18 +56,14 @@ public class DetailActivity extends BaseActivity {
     private ConstraintLayout clPlayerContainer;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Evtor.instance.register(this);
-    }
-
-    @Override
     protected int layout() {
         return R.layout.activity_detail;
     }
 
     @Override
     protected void initView() {
+        Evtor.instance.register(this);
+
         clPlayerContainer = $(R.id.cl_player_container);
         pvPlayer = $(R.id.pv_player);
         pbLoading = $(R.id.pb_loading);
@@ -74,19 +75,21 @@ public class DetailActivity extends BaseActivity {
         pvPlayer.setPlayer(mExoPlayer);//将播放器绑定到播放器视图上
         mExoPlayer.setPlayWhenReady(true);//设置播放器在准备好后开始播放
         mExoPlayer.setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);//设置播放器重复播放
+
+        mProgressTimer = new Timer();
     }
 
     @Override
     protected void initData() {
         EasyRouter.getInstance().inject(this);
 
-        ParserEngine.instance.process(this, mVideo.pageUrl);
+//        ParserEngine.instance.process(this, mVideo.pageUrl);
         // 接口获取播放链接
-//        ParserApi.instance.danMu(mVideo.pageUrl, url -> {
-////            LogUtils.iTag(TAG, "获取到播放链接：", url);
-//            // 播放
-////            play(url);
-//        });
+        ParserApi.instance.danMu(mVideo.pageUrl, url -> {
+//            LogUtils.iTag(TAG, "获取到播放链接：", url);
+            // 播放
+            play(url);
+        });
     }
 
     private void play(String url) {
@@ -94,7 +97,8 @@ public class DetailActivity extends BaseActivity {
                 .setUri(url)
                 .setMimeType(MimeTypes.APPLICATION_M3U8)
                 .build();
-        mExoPlayer.setMediaItem(mMediaItem, 0);
+        long position = KV.instance.kv().getLong(mVideo.pageUrl, 0);
+        mExoPlayer.setMediaItem(mMediaItem, position);
         mExoPlayer.prepare();
         mExoPlayer.play();
 
@@ -150,12 +154,33 @@ public class DetailActivity extends BaseActivity {
             }
 
             @Override
+            public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
+                if (events.contains(Player.EVENT_IS_PLAYING_CHANGED)) {
+                    long position = player.getCurrentPosition();
+                    LogUtils.iTag(TAG, "播放状态改变了", position);
+                }
+            }
+
+            @Override
             public void onPlayerError(@NonNull PlaybackException error) {
                 LogUtils.eTag(TAG, "出错啦", error.getLocalizedMessage());
                 // 尝试再次播放
                 mExoPlayer.play();
             }
         });
+
+        mProgressTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(() -> {
+                    long position = mExoPlayer.getCurrentPosition();
+//                    LogUtils.iTag(TAG, "进度变化：", position, "总时长：", mExoPlayer.getDuration());
+                    if (position > 0 && null != mVideo) {
+                        KV.instance.kv().putLong(mVideo.pageUrl, position);
+                    }
+                });
+            }
+        }, 0, 2);
     }
 
     @Override
@@ -192,6 +217,9 @@ public class DetailActivity extends BaseActivity {
         if (null != mExoPlayer) {
             mExoPlayer.stop();
             mExoPlayer.release();
+        }
+        if (null != mProgressTimer) {
+            mProgressTimer.cancel();
         }
         Evtor.instance.unregister(this);
         super.onDestroy();
