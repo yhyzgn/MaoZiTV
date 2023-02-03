@@ -1,12 +1,19 @@
 package com.yhy.mz.tv.ui;
 
 import android.os.Bundle;
-import android.widget.RelativeLayout;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.PlaybackException;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.yhy.evtor.Evtor;
@@ -16,6 +23,7 @@ import com.yhy.mz.tv.component.base.BaseActivity;
 import com.yhy.mz.tv.model.Video;
 import com.yhy.mz.tv.parser.ParserEngine;
 import com.yhy.mz.tv.utils.LogUtils;
+import com.yhy.mz.tv.utils.ViewUtils;
 import com.yhy.router.EasyRouter;
 import com.yhy.router.annotation.Autowired;
 import com.yhy.router.annotation.Router;
@@ -35,10 +43,12 @@ public class DetailActivity extends BaseActivity {
 
     @Autowired
     public Video mVideo;
-
-    private boolean mIsExtracted;
-    private RelativeLayout rlWvContainer;
     private StyledPlayerView pvPlayer;
+    private ExoPlayer mExoPlayer;
+    private ProgressBar pbLoading;
+
+    private boolean mIsFullScreen;
+    private ConstraintLayout clPlayerContainer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,8 +63,17 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        rlWvContainer = $(R.id.rl_wv_container);
+        clPlayerContainer = $(R.id.cl_player_container);
         pvPlayer = $(R.id.pv_player);
+        pbLoading = $(R.id.pb_loading);
+
+        //创建一个播放器
+        mExoPlayer = new ExoPlayer.Builder(this).build();
+        pvPlayer.setUseController(false);
+        pvPlayer.setShowBuffering(StyledPlayerView.SHOW_BUFFERING_NEVER);
+        pvPlayer.setPlayer(mExoPlayer);//将播放器绑定到播放器视图上
+        mExoPlayer.setPlayWhenReady(true);//设置播放器在准备好后开始播放
+        mExoPlayer.setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);//设置播放器重复播放
     }
 
     @Override
@@ -71,21 +90,72 @@ public class DetailActivity extends BaseActivity {
     }
 
     private void play(String url) {
-        ExoPlayer mExoPlayer = new ExoPlayer.Builder(this).build();//创建一个播放器
-        pvPlayer.setPlayer(mExoPlayer);//将播放器绑定到播放器视图上
-        mExoPlayer.setPlayWhenReady(true);//设置播放器在准备好后开始播放
-        mExoPlayer.setRepeatMode(ExoPlayer.REPEAT_MODE_ALL);//设置播放器重复播放
         MediaItem mMediaItem = new MediaItem.Builder()
                 .setUri(url)
                 .setMimeType(MimeTypes.APPLICATION_M3U8)
                 .build();
-        mExoPlayer.setMediaItem(mMediaItem);//设置播放器播放的媒体
-        mExoPlayer.prepare();//准备播放器
-        mExoPlayer.play();//播放播放器
+        mExoPlayer.setMediaItem(mMediaItem, 0);
+        mExoPlayer.prepare();
+        mExoPlayer.play();
+
+        pvPlayer.postDelayed(() -> performFullScreenOperations(true), 3000);
     }
 
     @Override
     protected void initEvent() {
+        mExoPlayer.addListener(new Player.Listener() {
+            @Override
+            public void onIsLoadingChanged(boolean isLoading) {
+                if (isLoading) {
+                    // 加载中
+                    LogUtils.iTag(TAG, "加载中");
+                    return;
+                }
+
+                LogUtils.iTag(TAG, "加载完成");
+            }
+
+            @Override
+            public void onPlaybackStateChanged(int state) {
+                switch (state) {
+                    case Player.STATE_BUFFERING:
+                        // 缓冲中
+                        LogUtils.iTag(TAG, "缓冲中");
+                        pbLoading.setVisibility(View.VISIBLE);
+                        break;
+                    case Player.STATE_READY:
+                        // 准备完成
+                        LogUtils.iTag(TAG, "准备完成");
+                        pbLoading.setVisibility(View.GONE);
+                        break;
+                    case Player.STATE_ENDED:
+                        // 播放完成
+                        LogUtils.iTag(TAG, "播放完成");
+                        break;
+                    case Player.STATE_IDLE:
+                        // 播放器已卸载
+                        break;
+                }
+            }
+
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                if (isPlaying) {
+                    LogUtils.iTag(TAG, "正在播放");
+                    return;
+                }
+
+                // 未播放
+                LogUtils.iTag(TAG, "停止中");
+            }
+
+            @Override
+            public void onPlayerError(@NonNull PlaybackException error) {
+                LogUtils.eTag(TAG, "出错啦", error.getLocalizedMessage());
+                // 尝试再次播放
+                mExoPlayer.play();
+            }
+        });
     }
 
     @Override
@@ -94,30 +164,63 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
+        if (mIsFullScreen) {
+            performFullScreenOperations(false);
+            return;
+        }
         super.onBackPressed();
     }
 
     @Override
     protected void onPause() {
+        if (null != mExoPlayer) {
+            mExoPlayer.pause();
+        }
         super.onPause();
     }
 
     @Override
     protected void onResume() {
+        if (null != mExoPlayer) {
+            mExoPlayer.play();
+        }
         super.onResume();
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        if (null != mExoPlayer) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+        }
         Evtor.instance.unregister(this);
+        super.onDestroy();
     }
 
     @Subscribe("extracted")
     public void extracted(String url) {
-        mIsExtracted = true;
         LogUtils.iTag(TAG, "已提取到 m3u8 地址:", url);
         Evtor.instance.subscribe("onWebViewParseSuccess").emit(url);
         play(url);
+    }
+
+    public void performFullScreenOperations(boolean fullscreen) {
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+        ViewGroup.LayoutParams params = clPlayerContainer.getLayoutParams();
+        if (!fullscreen) {
+            params.width = ViewUtils.dp2px(160);
+            params.height = ViewUtils.dp2px(90);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        } else {
+            params.width = params.MATCH_PARENT;
+            params.height = params.MATCH_PARENT;
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+        clPlayerContainer.setLayoutParams(params);
+        clPlayerContainer.setKeepScreenOn(fullscreen);
+        mIsFullScreen = fullscreen;
     }
 }

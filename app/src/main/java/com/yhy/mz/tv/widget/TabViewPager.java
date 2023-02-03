@@ -86,7 +86,6 @@ public class TabViewPager extends ViewPager {
             }
         }
 
-
         View nextFocused = FocusFinder.getInstance().findNextFocus(this, currentFocused,
                 direction);
         if (nextFocused != null && nextFocused != currentFocused) {
