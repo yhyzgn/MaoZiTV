@@ -14,13 +14,13 @@ import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.DefaultTimeBar;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.google.android.exoplayer2.util.MimeTypes;
 import com.yhy.evtor.Evtor;
 import com.yhy.evtor.annotation.Subscribe;
 import com.yhy.mz.tv.R;
 import com.yhy.mz.tv.cache.KV;
 import com.yhy.mz.tv.component.base.BaseActivity;
 import com.yhy.mz.tv.model.Video;
+import com.yhy.mz.tv.model.ems.Chan;
 import com.yhy.mz.tv.parser.ParserEngine;
 import com.yhy.mz.tv.utils.LogUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
@@ -46,6 +46,10 @@ public class DetailActivity extends BaseActivity {
 
     @Autowired
     public Video mVideo;
+    @Autowired
+    public int mChanCode;
+
+    private Chan mChan;
 
     private Timer mProgressTimer;
 
@@ -85,8 +89,8 @@ public class DetailActivity extends BaseActivity {
     @Override
     protected void initData() {
         EasyRouter.getInstance().inject(this);
-
-        ParserEngine.instance.process(this, mVideo.pageUrl);
+        mChan = Chan.parse(mChanCode);
+        ParserEngine.instance.process(this, mChan, mVideo.pageUrl);
         // 接口获取播放链接
 //        ParserApi.instance.danMu(mVideo.pageUrl, url -> {
 ////            LogUtils.iTag(TAG, "获取到播放链接：", url);
@@ -96,9 +100,10 @@ public class DetailActivity extends BaseActivity {
     }
 
     private void play(String url) {
+        String mimeType = ParserEngine.instance.mimeType(mChan);
         MediaItem mMediaItem = new MediaItem.Builder()
                 .setUri(url)
-                .setMimeType(MimeTypes.APPLICATION_M3U8)
+                .setMimeType(mimeType)
                 .build();
         long position = KV.instance.kv().getLong(mVideo.pageUrl, 0);
         mExoPlayer.setMediaItem(mMediaItem, position);

@@ -16,9 +16,14 @@
         <item name="android:clickable">true</item>
     </style>
 
-    <style name="ClockTimePicker" >
+    <style name="ClockTimePicker">
         <item name="android:textColorPrimary">@android:color/white</item>
     </style>
 
     <style name="Theme.MaoZiTV" parent="AppTheme" />
+
+    <!-- 设置背景透明 -->
+    <style name="BgTranslucent" parent="AppTheme">
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 </resources>

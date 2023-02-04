@@ -1,4 +1,4 @@
-package com.yhy.mz.tv.component.fragment;
+package com.yhy.mz.tv.ui.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -191,6 +191,7 @@ public class VpMainFragment extends BaseLazyLoadFragment {
                     .with(this)
                     .to("/activity/detail")
                     .param("mVideo", video)
+                    .param("mChanCode", mCurrentChanCode)
                     .go();
         });
     }

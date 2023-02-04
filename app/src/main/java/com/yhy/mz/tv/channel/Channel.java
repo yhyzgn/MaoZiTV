@@ -1,7 +1,7 @@
 package com.yhy.mz.tv.channel;
 
 import com.yhy.mz.tv.component.base.BaseLazyLoadFragment;
-import com.yhy.mz.tv.component.fragment.VpMainFragment;
+import com.yhy.mz.tv.ui.fragment.VpMainFragment;
 import com.yhy.mz.tv.model.Video;
 import com.yhy.mz.tv.model.ems.Chan;
 
