@@ -203,14 +203,14 @@ public class DetectiveActivity extends AppCompatActivity {
             return super.shouldInterceptRequest(view, request);
         }
 
-        @Override
-        public void onLoadResource(WebView view, String url) {
-            LogUtils.dTag(TAG, "onLoadResource url: " + url);
-            if (mParser.isVideoUrl(url)) {
-                Evtor.instance.subscribe("extracted").emit(url);
-                mActivity.finish();
-            }
-            super.onLoadResource(view, url);
-        }
+//        @Override
+//        public void onLoadResource(WebView view, String url) {
+//            LogUtils.dTag(TAG, "onLoadResource url: " + url);
+//            if (mParser.isVideoUrl(url)) {
+//                Evtor.instance.subscribe("extracted").emit(url);
+//                mActivity.finish();
+//            }
+//            super.onLoadResource(view, url);
+//        }
     }
 }
