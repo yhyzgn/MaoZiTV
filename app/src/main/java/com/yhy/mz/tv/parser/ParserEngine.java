@@ -33,9 +33,9 @@ public class ParserEngine {
     private final Map<Chan, Integer> mChanParserIndexMap = new HashMap<>();
 
     private ParserEngine() {
-        mParserList.add(new YeMuParser());
-        mParserList.add(new PanGuParser());
         mParserList.add(new OkParser());
+        mParserList.add(new PanGuParser());
+        mParserList.add(new YeMuParser());
 
         Evtor.instance.register(this);
     }

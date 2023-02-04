@@ -35,7 +35,7 @@ public class OkParser extends AbsParser {
 
     @Override
     public boolean isVideoUrl(String url) {
-        return url.startsWith("https://api.m3u8.pw/Cache") && url.contains(".m3u8?vkey=");
+        return url.contains(".m3u8?vkey=");
     }
 
     @Override
