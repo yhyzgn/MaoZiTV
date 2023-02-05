@@ -47,6 +47,8 @@ import java.lang.reflect.Method;
 /**
  * 资源嗅探
  * <p>
+ * https://blog.csdn.net/chy555chy/article/details/104479040
+ * <p>
  * Created on 2023-02-04 22:52
  *
  * @author 颜洪毅
