@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">猫子TV</string>
+    <string name="app_name_debug">猫子TV开发版</string>
+    <string name="app_name_release">猫子TV</string>
 </resources>

@@ -30,11 +30,12 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-        <com.google.android.exoplayer2.ui.DefaultTimeBar
+        <com.yhy.mz.tv.widget.SilenceTimeBar
                 android:id="@+id/tb_progress"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:focusable="false"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -45,4 +46,6 @@
                 app:unplayed_color="@android:color/black"
                 app:buffered_color="@android:color/darker_gray" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

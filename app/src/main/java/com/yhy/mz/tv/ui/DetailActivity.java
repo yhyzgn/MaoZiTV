@@ -12,7 +12,6 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.DefaultTimeBar;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.yhy.evtor.Evtor;
 import com.yhy.evtor.annotation.Subscribe;
@@ -24,6 +23,7 @@ import com.yhy.mz.tv.model.ems.Chan;
 import com.yhy.mz.tv.parser.ParserEngine;
 import com.yhy.mz.tv.utils.LogUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
+import com.yhy.mz.tv.widget.SilenceTimeBar;
 import com.yhy.router.EasyRouter;
 import com.yhy.router.annotation.Autowired;
 import com.yhy.router.annotation.Router;
@@ -59,7 +59,7 @@ public class DetailActivity extends BaseActivity {
 
     private boolean mIsFullScreen;
     private ConstraintLayout clPlayerContainer;
-    private DefaultTimeBar tbProgress;
+    private SilenceTimeBar tbProgressBottom;
 
     @Override
     protected int layout() {
@@ -73,15 +73,15 @@ public class DetailActivity extends BaseActivity {
         clPlayerContainer = $(R.id.cl_player_container);
         pvPlayer = $(R.id.pv_player);
         pbLoading = $(R.id.pb_loading);
-        tbProgress = $(R.id.tb_progress);
+        tbProgressBottom = $(R.id.tb_progress);
 
-        //创建一个播放器
+        // 创建一个播放器
         mExoPlayer = new ExoPlayer.Builder(this).build();
         pvPlayer.setUseController(false);
         pvPlayer.setShowBuffering(StyledPlayerView.SHOW_BUFFERING_NEVER);
-        pvPlayer.setPlayer(mExoPlayer);//将播放器绑定到播放器视图上
-        mExoPlayer.setPlayWhenReady(true);//设置播放器在准备好后开始播放
-        mExoPlayer.setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);//设置播放器重复播放
+        pvPlayer.setPlayer(mExoPlayer);// 将播放器绑定到播放器视图上
+        mExoPlayer.setPlayWhenReady(true);// 设置播放器在准备好后开始播放
+        mExoPlayer.setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);// 设置播放器重复播放
 
         mProgressTimer = new Timer();
     }
@@ -110,9 +110,9 @@ public class DetailActivity extends BaseActivity {
         mExoPlayer.prepare();
         mExoPlayer.play();
 
-        tbProgress.setBufferedPosition(mExoPlayer.getBufferedPosition());
-        tbProgress.setPosition(position);
-        tbProgress.hideScrubber(true);
+        tbProgressBottom.setBufferedPosition(mExoPlayer.getBufferedPosition());
+        tbProgressBottom.setPosition(position);
+        tbProgressBottom.hideScrubber(true);
 
         pvPlayer.postDelayed(() -> performFullScreenOperations(true), 3000);
     }
@@ -142,7 +142,7 @@ public class DetailActivity extends BaseActivity {
                     case Player.STATE_READY:
                         // 准备完成
                         LogUtils.iTag(TAG, "准备完成");
-                        tbProgress.setDuration(mExoPlayer.getDuration());
+                        tbProgressBottom.setDuration(mExoPlayer.getDuration());
                         pbLoading.setVisibility(View.GONE);
                         break;
                     case Player.STATE_ENDED:
@@ -177,8 +177,8 @@ public class DetailActivity extends BaseActivity {
             @Override
             public void onPlayerError(@NonNull PlaybackException error) {
                 LogUtils.eTag(TAG, "出错啦", error.getLocalizedMessage());
-                // 尝试再次播放
-                mExoPlayer.play();
+                // TODO 播放出错啦，多半是视频源解析出错，或者解析站的 Token 过期之类的，需要重新解析或者换个源即可
+                pbLoading.setVisibility(View.VISIBLE);
             }
         });
 
@@ -188,8 +188,8 @@ public class DetailActivity extends BaseActivity {
                 runOnUiThread(() -> {
                     long position = mExoPlayer.getCurrentPosition();
                     if (position > 0 && null != mVideo) {
-                        tbProgress.setPosition(position);
-                        tbProgress.setBufferedPosition(mExoPlayer.getBufferedPosition());
+                        tbProgressBottom.setPosition(position);
+                        tbProgressBottom.setBufferedPosition(mExoPlayer.getBufferedPosition());
                         KV.instance.kv().putLong(mVideo.pageUrl, position);
                     }
                 });
