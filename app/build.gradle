@@ -2,16 +2,38 @@ plugins {
     id 'com.android.application'
 }
 
+def config = rootProject.ext
+
 android {
     namespace 'com.yhy.mz.tv'
-    compileSdk 33
+    compileSdk config.sdk.compileSdk
+
+    // 配置密钥
+    signingConfigs {
+        debug {
+            storeFile file(config.keyDebug.storeFile)
+            storePassword config.keyDebug.storePassword
+            keyAlias config.keyDebug.keyAlias
+            keyPassword config.keyDebug.keyPassword
+        }
+
+        release {
+            storeFile file(config.keyRelease.storeFile)
+            storePassword config.keyRelease.storePassword
+            keyAlias config.keyRelease.keyAlias
+            keyPassword config.keyRelease.keyPassword
+        }
+    }
 
     defaultConfig {
         applicationId "com.yhy.mz.tv"
-        minSdk 26 // 8.0+
-        targetSdk 33
-        versionCode 1
-        versionName "1.0.0"
+        minSdk config.sdk.minSdk
+        targetSdk config.sdk.targetSdk
+        versionCode config.version.code
+        versionName config.version.name
+
+        // 开启多分包
+        multiDexEnabled true
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -19,21 +41,32 @@ android {
             }
         }
 
-        // 开启多分包
-        multiDexEnabled true
-
         ndk {
             // 设置支持的 so 库架构
             abiFilters "arm64-v8a", "armeabi-v7a", "x86"
         }
     }
 
+
     buildTypes {
+        // 调试版
+        debug {
+            minifyEnabled false
+            debuggable true
+            signingConfig signingConfigs.debug
+            applicationIdSuffix '.debug'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        // 发行版
         release {
             minifyEnabled false
+            debuggable false
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     packagingOptions {
         jniLibs {
             excludes += ['META-INF/*']
@@ -43,16 +76,28 @@ android {
         }
     }
 
+    // 打包apk自动生成名称
+    android.applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "猫子TV_v${defaultConfig.versionName}_${defaultConfig.versionCode}.apk"
+        }
+    }
+
+    // 忽略打包时的警告
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+        disable 'TransformException'
+        ignoreWarnings true
+    }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 }
 
 dependencies {
-    implementation files('libs/rhino-1.7.14.jar')
-
     implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "androidx.multidex:multidex:2.0.1"
@@ -82,9 +127,8 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer-hls:2.18.2'
 
     implementation 'me.jessyan:autosize:1.2.1'
-    implementation 'com.tencent.bugly:crashreport:4.1.9'
-    implementation 'com.tencent.bugly:nativecrashreport:3.9.2'
-    implementation 'org.xwalk:xwalk_shared_library:23.53.589.4'
+//    implementation 'com.tencent.bugly:crashreport:4.1.9'
+//    implementation 'com.tencent.bugly:nativecrashreport:3.9.2'
 
     implementation 'com.github.yhyzgn:Evtor:2.0.1'
     implementation 'com.github.yhyzgn.EasyRouter:router:2.0.1'

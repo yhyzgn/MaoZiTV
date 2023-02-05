@@ -2,7 +2,10 @@ package com.yhy.mz.tv.ui;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.net.http.SslError;
 import android.os.Build;
@@ -38,6 +41,9 @@ import com.yhy.router.EasyRouter;
 import com.yhy.router.annotation.Autowired;
 import com.yhy.router.annotation.Router;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
 /**
  * 资源嗅探
  * <p>
@@ -60,6 +66,10 @@ public class DetectiveActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        if (needCheckOrientation()) {
+            boolean fixOrientation = fixOrientation();
+            LogUtils.iTag(TAG, "onCreate fixOrientation when Oreo, result = " + fixOrientation);
+        }
         super.onCreate(savedInstanceState);
         EasyRouter.getInstance().inject(this);
 
@@ -68,6 +78,48 @@ public class DetectiveActivity extends AppCompatActivity {
 
         mParser = ParserEngine.instance.getByPrs(Prs.parse(mPrsCode));
         loadWebView();
+    }
+
+    private boolean needCheckOrientation() {
+        return Build.VERSION.SDK_INT == Build.VERSION_CODES.O && isTranslucentOrFloating();
+    }
+
+    @Override
+    public void setRequestedOrientation(int requestedOrientation) {
+        if (needCheckOrientation()) {
+            LogUtils.iTag(TAG, "setRequestedOrientation avoid calling setRequestedOrientation when Oreo");
+            return;
+        }
+        super.setRequestedOrientation(requestedOrientation);
+    }
+
+    private boolean isTranslucentOrFloating() {
+        boolean isTranslucentOrFloating = false;
+        try {
+            int[] styleableRes = (int[]) Class.forName("com.android.internal.R$styleable").getField("Window").get(null);
+            final TypedArray ta = obtainStyledAttributes(styleableRes);
+            Method m = ActivityInfo.class.getMethod("isTranslucentOrFloating", TypedArray.class);
+            m.setAccessible(true);
+            isTranslucentOrFloating = (boolean) m.invoke(null, ta);
+            m.setAccessible(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return isTranslucentOrFloating;
+    }
+
+    private boolean fixOrientation() {
+        try {
+            Field field = Activity.class.getDeclaredField("mActivityInfo");
+            field.setAccessible(true);
+            ActivityInfo o = (ActivityInfo) field.get(this);
+            o.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+            field.setAccessible(false);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
@@ -178,6 +230,7 @@ public class DetectiveActivity extends AppCompatActivity {
     private static class SysWebClient extends WebViewClient {
         private final AppCompatActivity mActivity;
         private final Parser mParser;
+        private boolean mExtracted = false;
 
         public SysWebClient(AppCompatActivity activity, Parser parser) {
             mActivity = activity;
@@ -196,21 +249,23 @@ public class DetectiveActivity extends AppCompatActivity {
         public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
             String url = request.getUrl().toString();
             LogUtils.dTag(TAG, "shouldInterceptRequest url: " + url);
-            if (mParser.isVideoUrl(url)) {
-                Evtor.instance.subscribe("extracted").emit(url);
-                mActivity.finish();
-            }
+            judgeExtracted(url);
             return super.shouldInterceptRequest(view, request);
         }
 
-//        @Override
-//        public void onLoadResource(WebView view, String url) {
-//            LogUtils.dTag(TAG, "onLoadResource url: " + url);
-//            if (mParser.isVideoUrl(url)) {
-//                Evtor.instance.subscribe("extracted").emit(url);
-//                mActivity.finish();
-//            }
-//            super.onLoadResource(view, url);
-//        }
+        @Override
+        public void onLoadResource(WebView view, String url) {
+            LogUtils.dTag(TAG, "onLoadResource url: " + url);
+            judgeExtracted(url);
+            super.onLoadResource(view, url);
+        }
+
+        private synchronized void judgeExtracted(String url) {
+            if (mParser.isVideoUrl(url) && !mExtracted) {
+                mExtracted = true;
+                Evtor.instance.subscribe("extracted").emit(url);
+                mActivity.finish();
+            }
+        }
     }
 }
