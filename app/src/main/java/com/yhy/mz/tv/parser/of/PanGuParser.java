@@ -35,6 +35,6 @@ public class PanGuParser extends AbsParser {
 
     @Override
     public boolean isVideoUrl(String url) {
-        return url.contains("/PlayVideo.php?url=") && url.endsWith("=.m3u8");
+        return url.contains("/key.php?token=") && url.endsWith("=.m3u8");
     }
 }

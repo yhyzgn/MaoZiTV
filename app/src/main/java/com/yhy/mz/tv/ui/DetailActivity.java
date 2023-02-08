@@ -37,7 +37,10 @@ import com.yhy.router.annotation.Autowired;
 import com.yhy.router.annotation.Router;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -68,6 +71,21 @@ public class DetailActivity extends BaseActivity {
     private Chan mChan;
 
     private final List<ParserWebView> mWvList = new ArrayList<>();
+
+    /**
+     * 解析器黑名单，不可用的自动进入该列表
+     */
+    private final List<Parser> mParserBlackList = new ArrayList<>();
+
+    /**
+     * 记录解析器错误次数
+     */
+    private final Map<Parser, Integer> mParserErrorCountMap = new HashMap<>();
+
+    /**
+     * 当前已成功解析的解析器
+     */
+    private Parser mParser;
 
 
     private Timer mProgressTimer;
@@ -187,8 +205,20 @@ public class DetailActivity extends BaseActivity {
             @Override
             public void onPlayerError(@NonNull PlaybackException error) {
                 LogUtils.eTag(TAG, "出错啦", error.getLocalizedMessage());
-                // TODO 播放出错啦，多半是视频源解析出错，或者解析站的 Token 过期之类的，需要重新解析或者换个源即可
                 pbLoading.setVisibility(View.VISIBLE);
+                // 播放出错啦，多半是视频源解析出错，或者解析站的 Token 过期之类的，需要重新解析或者换个源即可
+                // 播放错误次数超过 x 次的解析器自动进入黑名单，下一次解析将其直接失效
+                int errorCount = Optional.ofNullable(mParserErrorCountMap.getOrDefault(mParser, 1)).orElse(1);
+                if (errorCount >= 2) {
+                    //LogUtils.iTag(TAG, "解析器【" + mParser.prs().getName() + "】自动进入黑名单");
+                    mParserBlackList.add(mParser);
+                } else {
+                    errorCount++;
+                    //LogUtils.iTag(TAG, "解析器【" + mParser.prs().getName() + "】播放出错次数：" + errorCount);
+                    mParserErrorCountMap.put(mParser, errorCount);
+                }
+
+                //startParsing();
             }
         });
 
@@ -310,7 +340,8 @@ public class DetailActivity extends BaseActivity {
         }
 
         mWvList.clear();
-        parserList.forEach(it -> {
+        // 自动过滤黑名单中的解析器
+        parserList.stream().filter(it -> !mParserBlackList.contains(it)).forEach(it -> {
             String url = it.prs().getUrl() + mVideo.pageUrl;
             ParserWebView wv = mApp.isX5Already() ? new ParserWebViewX5(this) : new ParserWebViewDefault(this);
             wv.attach(this, it, url);

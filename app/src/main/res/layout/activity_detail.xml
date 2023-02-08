@@ -38,6 +38,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:maxLines="1"
+                android:ellipsize="end"
                 android:textSize="6sp"
                 android:textColor="@color/colorWhite"
                 android:paddingStart="2dp"
