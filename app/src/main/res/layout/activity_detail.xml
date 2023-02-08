@@ -60,4 +60,18 @@
                 app:unplayed_color="@android:color/darker_gray"
                 app:buffered_color="@color/colorWhite" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="160dp"
+            android:layout_height="90dp"
+            android:background="@color/colorBlack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+        <com.lodz.android.mmsplayer.impl.MmsVideoView
+                android:id="@+id/vv_player"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

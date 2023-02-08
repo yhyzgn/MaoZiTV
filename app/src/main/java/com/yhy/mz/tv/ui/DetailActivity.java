@@ -14,6 +14,9 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
+import com.lodz.android.mmsplayer.ijk.media.IRenderView;
+import com.lodz.android.mmsplayer.ijk.setting.IjkPlayerSetting;
+import com.lodz.android.mmsplayer.impl.MmsVideoView;
 import com.yhy.evtor.Evtor;
 import com.yhy.evtor.annotation.Subscribe;
 import com.yhy.mz.tv.R;
@@ -39,6 +42,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 /**
  * 详情页
@@ -76,6 +81,9 @@ public class DetailActivity extends BaseActivity {
     private ConstraintLayout clPlayerContainer;
     private SilenceTimeBar tbProgressBottom;
 
+
+    private MmsVideoView vvPlayer;
+
     @Override
     protected int layout() {
         return R.layout.activity_detail;
@@ -99,6 +107,13 @@ public class DetailActivity extends BaseActivity {
         mExoPlayer.setPlayWhenReady(true);// 设置播放器在准备好后开始播放
         mExoPlayer.setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);// 设置播放器重复播放
 
+        vvPlayer = $(R.id.vv_player);
+        IjkPlayerSetting setting = IjkPlayerSetting.getDefault();
+        setting.aspectRatioType = IRenderView.AR_ASPECT_WRAP_CONTENT;
+        setting.renderViewType = IjkPlayerSetting.RenderViewType.SURFACE_VIEW;
+        setting.isUsingOpenSLES = false;
+        vvPlayer.init(setting);
+
         mProgressTimer = new Timer();
     }
 
@@ -108,12 +123,6 @@ public class DetailActivity extends BaseActivity {
         mChan = Chan.parse(mChanCode);
 
         startParsing();
-        // 接口获取播放链接
-//        ParserApi.instance.danMu(mVideo.pageUrl, url -> {
-////            LogUtils.iTag(TAG, "获取到播放链接：", url);
-//            // 播放
-////            play(url);
-//        });
     }
 
     @Override
@@ -196,6 +205,40 @@ public class DetailActivity extends BaseActivity {
                 });
             }
         }, 0, 1);
+
+        vvPlayer.setListener(new MmsVideoView.Listener() {
+            @Override
+            public void onPrepared() {
+                LogUtils.iTag(TAG, "IjkPlayer", "已就绪");
+                // 准备就绪就自动开始播放
+                //vvPlayer.start();
+            }
+
+            @Override
+            public void onBufferingStart() {
+                LogUtils.iTag(TAG, "IjkPlayer", "开始缓冲");
+            }
+
+            @Override
+            public void onBufferingEnd() {
+                LogUtils.iTag(TAG, "IjkPlayer", "缓冲完成");
+            }
+
+            @Override
+            public void onCompletion() {
+                LogUtils.iTag(TAG, "IjkPlayer", "播放完成");
+            }
+
+            @Override
+            public void onError(int errorType, String msg) {
+                LogUtils.eTag(TAG, "IjkPlayer", "播放异常", errorType, msg);
+            }
+
+            @Override
+            public void onMediaPlayerCreated(@NonNull IMediaPlayer mediaPlayer) {
+                LogUtils.iTag(TAG, "IjkPlayer", "播放器创建完成");
+            }
+        });
     }
 
     @Override
@@ -306,7 +349,10 @@ public class DetailActivity extends BaseActivity {
         tbProgressBottom.setPosition(position);
         tbProgressBottom.hideScrubber(true);
 
-        pvPlayer.postDelayed(() -> toggleScreen(true), 3000);
+        vvPlayer.setVideoPath(url);
+        vvPlayer.seekAndStart(position);
+
+        //pvPlayer.postDelayed(() -> toggleScreen(true), 3000);
     }
 
     private void toggleScreen(boolean fullscreen) {
