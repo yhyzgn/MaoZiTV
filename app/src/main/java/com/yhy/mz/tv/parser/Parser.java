@@ -1,7 +1,5 @@
 package com.yhy.mz.tv.parser;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.yhy.mz.tv.model.ems.Chan;
 import com.yhy.mz.tv.model.ems.Prs;
 
@@ -47,12 +45,4 @@ public interface Parser {
      * @return 是否是视频
      */
     boolean isVideoUrl(String url);
-
-    /**
-     * 解析一个地址
-     *
-     * @param activity 当前 Activity
-     * @param url      视频地址
-     */
-    void process(AppCompatActivity activity, String url);
 }

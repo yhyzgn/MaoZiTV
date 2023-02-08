@@ -1,7 +1,5 @@
 package com.yhy.mz.tv.parser.of;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.yhy.mz.tv.internal.Lists;
 import com.yhy.mz.tv.model.ems.Chan;
@@ -36,10 +34,5 @@ public class OkParser extends AbsParser {
     @Override
     public boolean isVideoUrl(String url) {
         return url.contains(".m3u8?vkey=");
-    }
-
-    @Override
-    public void process(AppCompatActivity activity, String url) {
-        loadWebView(activity, url, this);
     }
 }

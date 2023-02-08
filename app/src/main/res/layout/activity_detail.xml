@@ -30,22 +30,34 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+        <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_parsing_log"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:maxLines="1"
+                android:textSize="6sp"
+                android:textColor="@color/colorWhite"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp" />
+
         <com.yhy.mz.tv.widget.SilenceTimeBar
                 android:id="@+id/tb_progress"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:focusable="false"
+                android:contentDescription="TimeLine"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:played_color="@color/colorPrimary"
                 app:bar_height="1dp"
                 app:ad_marker_width="0dp"
                 app:touch_target_height="1dp"
-                app:unplayed_color="@android:color/black"
-                app:buffered_color="@android:color/darker_gray" />
+                app:played_color="@color/colorPrimary"
+                app:unplayed_color="@android:color/darker_gray"
+                app:buffered_color="@color/colorWhite" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -16,6 +16,8 @@ import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.lzy.okgo.model.HttpHeaders;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+import com.tencent.smtt.export.external.TbsCoreSettings;
+import com.tencent.smtt.sdk.QbSdk;
 import com.yhy.mz.tv.api.RandHeaderInterceptor;
 import com.yhy.mz.tv.cache.KV;
 import com.yhy.mz.tv.rand.IpRand;
@@ -32,6 +34,8 @@ import com.yhy.router.common.JsonConverter;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -53,29 +57,11 @@ public class App extends MultiDexApplication {
 
     private static final String TAG = "App";
 
+    private boolean x5Already;
+
     @Override
     public void onCreate() {
         super.onCreate();
-//        QbSdk.initX5Environment(this, new QbSdk.PreInitCallback() {
-//            @Override
-//            public void onCoreInitFinished() {
-//                // 内核初始化完成，可能为系统内核，也可能为系统内核
-//                Map<String, Object> map = new HashMap<>();
-//                map.put(TbsCoreSettings.TBS_SETTINGS_USE_SPEEDY_CLASSLOADER, true);
-//                map.put(TbsCoreSettings.TBS_SETTINGS_USE_DEXLOADER_SERVICE, true);
-//                QbSdk.initTbsSettings(map);
-//            }
-//
-//            /**
-//             * 预初始化结束
-//             * 由于X5内核体积较大，需要依赖网络动态下发，所以当内核不存在的时候，默认会回调false，此时将会使用系统内核代替
-//             * @param isX5 是否使用X5内核
-//             */
-//            @Override
-//            public void onViewInitFinished(boolean isX5) {
-//
-//            }
-//        });
 
         init();
     }
@@ -85,6 +71,7 @@ public class App extends MultiDexApplication {
         initFastKV();
         initRouter();
         initOkGo();
+        initX5WebView();
         initPlayer();
     }
 
@@ -186,6 +173,31 @@ public class App extends MultiDexApplication {
                 });
     }
 
+    private void initX5WebView() {
+        Map<String, Object> map = new HashMap<>();
+        map.put(TbsCoreSettings.TBS_SETTINGS_USE_SPEEDY_CLASSLOADER, true);
+        map.put(TbsCoreSettings.TBS_SETTINGS_USE_DEXLOADER_SERVICE, true);
+        QbSdk.initTbsSettings(map);
+
+        QbSdk.initX5Environment(this, new QbSdk.PreInitCallback() {
+            @Override
+            public void onCoreInitFinished() {
+                // 内核初始化完成，可能为系统内核，也可能为系统内核
+            }
+
+            /**
+             * 预初始化结束
+             * 由于X5内核体积较大，需要依赖网络动态下发，所以当内核不存在的时候，默认会回调false，此时将会使用系统内核代替
+             *
+             * @param isX5 是否使用X5内核
+             */
+            @Override
+            public void onViewInitFinished(boolean isX5) {
+                x5Already = isX5;
+            }
+        });
+    }
+
     private void initPlayer() {
 //        ExoSourceManager.setExoMediaSourceInterceptListener(new ExoMediaSourceInterceptListener() {
 //            @Override
@@ -246,5 +258,9 @@ public class App extends MultiDexApplication {
                 .setCacheTime(CacheEntity.CACHE_NEVER_EXPIRE)   // 全局统一缓存时间，默认永不过期，可以不传
                 .setRetryCount(3)                               // 全局统一超时重连次数，默认为三次，那么最差的情况会请求4次(一次原始请求，三次重连请求)，不需要可以设置为0
                 .addCommonHeaders(headers);                     // 全局公共头;
+    }
+
+    public boolean isX5Already() {
+        return x5Already;
     }
 }

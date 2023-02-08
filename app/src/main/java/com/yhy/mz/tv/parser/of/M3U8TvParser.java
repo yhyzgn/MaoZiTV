@@ -1,7 +1,5 @@
 package com.yhy.mz.tv.parser.of;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.yhy.mz.tv.internal.Lists;
 import com.yhy.mz.tv.model.ems.Chan;
@@ -17,7 +15,7 @@ import java.util.List;
  * @version 1.0.0
  * @since 1.0.0
  */
-public class YeMuParser extends AbsParser {
+public class M3U8TvParser extends AbsParser {
     @Override
     public Prs prs() {
         return Prs.M3U8_TV;
@@ -48,10 +46,5 @@ public class YeMuParser extends AbsParser {
         return url.contains("zh188.net") && url.contains("=.m3u8") || // 爱奇艺
                 url.contains("om.tc.qq.com") && url.contains(".mp4?from=M3U8TV") // 腾讯
                 ;
-    }
-
-    @Override
-    public void process(AppCompatActivity activity, String url) {
-        loadWebView(activity, url, this);
     }
 }

@@ -6,6 +6,7 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.google.android.exoplayer2.ExoPlayer;
@@ -20,16 +21,24 @@ import com.yhy.mz.tv.cache.KV;
 import com.yhy.mz.tv.component.base.BaseActivity;
 import com.yhy.mz.tv.model.Video;
 import com.yhy.mz.tv.model.ems.Chan;
+import com.yhy.mz.tv.parser.Parser;
 import com.yhy.mz.tv.parser.ParserEngine;
 import com.yhy.mz.tv.utils.LogUtils;
 import com.yhy.mz.tv.utils.ViewUtils;
 import com.yhy.mz.tv.widget.SilenceTimeBar;
+import com.yhy.mz.tv.widget.web.ParserWebView;
+import com.yhy.mz.tv.widget.web.ParserWebViewDefault;
+import com.yhy.mz.tv.widget.web.ParserWebViewX5;
 import com.yhy.router.EasyRouter;
 import com.yhy.router.annotation.Autowired;
 import com.yhy.router.annotation.Router;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 详情页
@@ -44,6 +53,8 @@ import java.util.TimerTask;
 public class DetailActivity extends BaseActivity {
     private static final String TAG = "DetailActivity";
 
+    private ExecutorService mParserService;
+
     @Autowired
     public Video mVideo;
     @Autowired
@@ -51,10 +62,14 @@ public class DetailActivity extends BaseActivity {
 
     private Chan mChan;
 
+    private final List<ParserWebView> mWvList = new ArrayList<>();
+
+
     private Timer mProgressTimer;
 
     private StyledPlayerView pvPlayer;
     private ExoPlayer mExoPlayer;
+    private AppCompatTextView tvParsingLog;
     private ProgressBar pbLoading;
 
     private boolean mIsFullScreen;
@@ -72,6 +87,7 @@ public class DetailActivity extends BaseActivity {
 
         clPlayerContainer = $(R.id.cl_player_container);
         pvPlayer = $(R.id.pv_player);
+        tvParsingLog = $(R.id.tv_parsing_log);
         pbLoading = $(R.id.pb_loading);
         tbProgressBottom = $(R.id.tb_progress);
 
@@ -90,31 +106,14 @@ public class DetailActivity extends BaseActivity {
     protected void initData() {
         EasyRouter.getInstance().inject(this);
         mChan = Chan.parse(mChanCode);
-        ParserEngine.instance.process(this, mChan, mVideo.pageUrl);
+
+        startParsing();
         // 接口获取播放链接
 //        ParserApi.instance.danMu(mVideo.pageUrl, url -> {
 ////            LogUtils.iTag(TAG, "获取到播放链接：", url);
 //            // 播放
 ////            play(url);
 //        });
-    }
-
-    private void play(String url) {
-        String mimeType = ParserEngine.instance.mimeType(mChan);
-        MediaItem mMediaItem = new MediaItem.Builder()
-                .setUri(url)
-                .setMimeType(mimeType)
-                .build();
-        long position = KV.instance.kv().getLong(mVideo.pageUrl, 0);
-        mExoPlayer.setMediaItem(mMediaItem, position);
-        mExoPlayer.prepare();
-        mExoPlayer.play();
-
-        tbProgressBottom.setBufferedPosition(mExoPlayer.getBufferedPosition());
-        tbProgressBottom.setPosition(position);
-        tbProgressBottom.hideScrubber(true);
-
-        pvPlayer.postDelayed(() -> performFullScreenOperations(true), 3000);
     }
 
     @Override
@@ -142,6 +141,8 @@ public class DetailActivity extends BaseActivity {
                     case Player.STATE_READY:
                         // 准备完成
                         LogUtils.iTag(TAG, "准备完成");
+                        tvParsingLog.setVisibility(View.GONE);
+                        tbProgressBottom.setVisibility(View.VISIBLE);
                         tbProgressBottom.setDuration(mExoPlayer.getDuration());
                         pbLoading.setVisibility(View.GONE);
                         break;
@@ -204,7 +205,7 @@ public class DetailActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (mIsFullScreen) {
-            performFullScreenOperations(false);
+            toggleScreen(false);
             return;
         }
         super.onBackPressed();
@@ -236,17 +237,79 @@ public class DetailActivity extends BaseActivity {
             mProgressTimer.cancel();
         }
         Evtor.instance.unregister(this);
+        stopParsing(true);
+
         super.onDestroy();
     }
 
     @Subscribe("extracted")
-    public void extracted(String url) {
-        LogUtils.iTag(TAG, "已提取到 m3u8 地址:", url);
-        Evtor.instance.subscribe("onWebViewParseSuccess").emit(url);
-        play(url);
+    public void extracted(Parser parser, String url) {
+        stopParsing(false);
+        LogUtils.iTag(TAG, "已提取到 m3u8 地址", parser.prs().getName(), url);
+        play(parser, url);
     }
 
-    public void performFullScreenOperations(boolean fullscreen) {
+    @Subscribe("parsingLog")
+    public void parsingLog(String tag, String parserName, String url) {
+        LogUtils.iTag(tag, parserName, url);
+        tvParsingLog.setText(parserName + "：" + url);
+    }
+
+    private void startParsing() {
+        if (null == mParserService) {
+            mParserService = Executors.newSingleThreadExecutor();
+        }
+
+        List<Parser> parserList = ParserEngine.instance.getParserList(mChan);
+        if (parserList.isEmpty()) {
+            error("未匹配到解析器");
+            return;
+        }
+
+        mWvList.clear();
+        parserList.forEach(it -> {
+            String url = it.prs().getUrl() + mVideo.pageUrl;
+            ParserWebView wv = mApp.isX5Already() ? new ParserWebViewX5(this) : new ParserWebViewDefault(this);
+            wv.attach(this, it, url);
+            mWvList.add(wv);
+        });
+
+        mWvList.forEach(it -> mParserService.execute(it::start));
+
+        tvParsingLog.setVisibility(View.VISIBLE);
+        tbProgressBottom.setVisibility(View.GONE);
+    }
+
+    private void stopParsing(boolean destroy) {
+        if (null != mParserService) {
+            mParserService.shutdown();
+            mParserService = null;
+        }
+        if (!mWvList.isEmpty()) {
+            mWvList.forEach(it -> it.stop(destroy));
+            mWvList.clear();
+        }
+    }
+
+    private void play(Parser parser, String url) {
+        String mimeType = parser.mimeType(mChan);
+        MediaItem mMediaItem = new MediaItem.Builder()
+                .setUri(url)
+                .setMimeType(mimeType)
+                .build();
+        long position = KV.instance.kv().getLong(mVideo.pageUrl, 0);
+        mExoPlayer.setMediaItem(mMediaItem, position);
+        mExoPlayer.prepare();
+        mExoPlayer.play();
+
+        tbProgressBottom.setBufferedPosition(mExoPlayer.getBufferedPosition());
+        tbProgressBottom.setPosition(position);
+        tbProgressBottom.hideScrubber(true);
+
+        pvPlayer.postDelayed(() -> toggleScreen(true), 3000);
+    }
+
+    private void toggleScreen(boolean fullscreen) {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
