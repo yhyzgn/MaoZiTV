@@ -127,7 +127,6 @@ public class DetailActivity extends BaseActivity {
 
         vvPlayer = $(R.id.vv_player);
         IjkPlayerSetting setting = IjkPlayerSetting.getDefault();
-        setting.aspectRatioType = IRenderView.AR_ASPECT_WRAP_CONTENT;
         setting.renderViewType = IjkPlayerSetting.RenderViewType.SURFACE_VIEW;
         setting.isUsingOpenSLES = false;
         vvPlayer.init(setting);
