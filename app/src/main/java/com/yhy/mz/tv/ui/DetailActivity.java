@@ -14,9 +14,11 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.lodz.android.mmsplayer.ijk.media.IRenderView;
 import com.lodz.android.mmsplayer.ijk.setting.IjkPlayerSetting;
 import com.lodz.android.mmsplayer.impl.MmsVideoView;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.Response;
 import com.yhy.evtor.Evtor;
 import com.yhy.evtor.annotation.Subscribe;
 import com.yhy.mz.tv.R;
@@ -45,6 +47,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 
@@ -139,7 +143,31 @@ public class DetailActivity extends BaseActivity {
         EasyRouter.getInstance().inject(this);
         mChan = Chan.parse(mChanCode);
 
-        startParsing();
+        if (mChan == Chan.KU_FILM || mChan == Chan.KU_EPISODE) {
+            OkGo.<String>get(mVideo.pageUrl).execute(new StringCallback() {
+                @Override
+                public void onSuccess(Response<String> response) {
+                    // <meta itemprop="url" content="https://v.youku.com/v_show/id_XNTk0MTM4OTgzNg==.html?s=fcdf63ffd2a841b795e2"/>
+                    String html = response.body().replaceAll("[\t\n\\s]", "");
+                    Pattern pattern = Pattern.compile("^.*?<metaitemprop=\"url\"content=\"(.*?)\".*$");
+                    Matcher matcher = pattern.matcher(html);
+
+                    System.out.println(html);
+
+                    if (matcher.matches()) {
+                        String pageUrl = matcher.group(1);
+                        LogUtils.iTag(TAG, "优酷播放源提取到视频地址", pageUrl);
+                        mVideo.pageUrl = pageUrl;
+
+                        startParsing();
+                    } else {
+                        error("未匹配到视频源地址");
+                    }
+                }
+            });
+        } else {
+            startParsing();
+        }
     }
 
     @Override

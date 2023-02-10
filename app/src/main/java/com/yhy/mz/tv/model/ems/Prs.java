@@ -20,6 +20,11 @@ public enum Prs {
     YE_MU(5, "夜幕", "https://www.yemu.xyz/?url="),
     JSON_PLAYER(6, "JsonPlayer", "https://jx.jsonplayer.com/player/?url="),
     M3U8_TV(7, "M3U8.TV", "https://jx.m3u8.tv/jiexi/?url="),
+    AI_DOU_ER(8, "爱豆儿", "https://jx.aidouer.net/?url="),
+    XIA_MI(9, "虾米", "https://jx.xmflv.com/?url="),
+    DV4K(10, "4K", "https://jx.4kdv.com/?url="),
+    NX_FLV(11, "诺讯", "https://www.nxflv.com/?url="),
+    BI_LIN(12, "比邻", "https://video.bilnn.com/api.php?url="),
     ;
 
     private final Integer code;
