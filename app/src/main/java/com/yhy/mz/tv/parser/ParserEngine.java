@@ -1,6 +1,7 @@
 package com.yhy.mz.tv.parser;
 
 import com.yhy.mz.tv.model.ems.Chan;
+import com.yhy.mz.tv.parser.of.JsonPlayerParser;
 import com.yhy.mz.tv.parser.of.M3U8TvParser;
 import com.yhy.mz.tv.parser.of.OkParser;
 import com.yhy.mz.tv.parser.of.PanGuParser;
@@ -24,6 +25,7 @@ public class ParserEngine {
     private final List<Parser> mParserList = new ArrayList<>();
 
     private ParserEngine() {
+        mParserList.add(new JsonPlayerParser());
         mParserList.add(new OkParser());
         mParserList.add(new PanGuParser());
         mParserList.add(new M3U8TvParser());

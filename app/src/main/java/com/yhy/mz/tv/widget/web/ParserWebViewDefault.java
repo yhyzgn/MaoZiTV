@@ -30,6 +30,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.yhy.evtor.Evtor;
 import com.yhy.mz.tv.BuildConfig;
 import com.yhy.mz.tv.parser.Parser;
+import com.yhy.mz.tv.utils.LogUtils;
+
+import java.util.Map;
 
 /**
  * 视频解析提取器
@@ -134,12 +137,12 @@ public class ParserWebViewDefault extends WebView implements ParserWebView {
 
         setWebViewClient(new SysWebClient(parser));
 
-        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(1, 1);
+        ViewGroup.LayoutParams lp = BuildConfig.DEBUG ? new ViewGroup.LayoutParams(400, 400) : new ViewGroup.LayoutParams(1, 1);
         MarginLayoutParams mlp = new MarginLayoutParams(lp);
         mlp.leftMargin = -1;
         mlp.topMargin = -1;
         activity.addContentView(this, mlp);
-        setVisibility(INVISIBLE);
+        setVisibility(BuildConfig.DEBUG ? VISIBLE : INVISIBLE);
     }
 
     @Override
