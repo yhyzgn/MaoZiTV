@@ -15,6 +15,7 @@ import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.lzy.okgo.model.HttpHeaders;
 import com.shuyu.gsyvideoplayer.cache.CacheFactory;
+import com.shuyu.gsyvideoplayer.utils.GSYVideoType;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.tencent.smtt.export.external.TbsCoreSettings;
@@ -227,6 +228,7 @@ public class App extends MultiDexApplication {
         // 播放器
 //        PlayerFactory.setPlayManager(Exo2PlayerManager.class);
         CacheFactory.setCacheManager(ExoPlayerCacheManager.class);
+        GSYVideoType.setRenderType(GSYVideoType.GLSURFACE);
     }
 
     private void initOkGo() {

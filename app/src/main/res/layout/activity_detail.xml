@@ -11,68 +11,9 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-        <com.google.android.exoplayer2.ui.StyledPlayerView
-                android:id="@+id/pv_player"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/colorBlack"
-                app:resize_mode="fixed_width"
-                app:show_buffering="when_playing" />
-
-        <ProgressBar
-                android:id="@+id/pb_loading"
-                android:layout_width="14dp"
-                android:layout_height="14dp"
-                android:indeterminate="false"
-                android:indeterminateTint="@color/colorPrimary"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/tv_parsing_log"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:textSize="6sp"
-                android:textColor="@color/colorWhite"
-                android:paddingStart="2dp"
-                android:paddingEnd="2dp" />
-
-        <com.yhy.mz.tv.widget.SilenceTimeBar
-                android:id="@+id/tb_progress"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:focusable="false"
-                android:contentDescription="TimeLine"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:bar_height="1dp"
-                app:ad_marker_width="0dp"
-                app:touch_target_height="1dp"
-                app:played_color="@color/colorPrimary"
-                app:unplayed_color="@android:color/darker_gray"
-                app:buffered_color="@color/colorWhite" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="320dp"
-            android:layout_height="180dp"
-            android:background="@color/colorBlack"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
         <com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
                 android:id="@+id/vv_player"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

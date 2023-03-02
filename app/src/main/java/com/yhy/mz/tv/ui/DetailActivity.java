@@ -1,24 +1,15 @@
 package com.yhy.mz.tv.ui;
 
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.ProgressBar;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatTextView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.PlaybackException;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
+import com.google.android.exoplayer2.util.MimeTypes;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
 import com.shuyu.gsyvideoplayer.listener.GSYSampleCallBack;
+import com.shuyu.gsyvideoplayer.player.IjkPlayerManager;
+import com.shuyu.gsyvideoplayer.player.PlayerFactory;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 import com.yhy.evtor.Evtor;
 import com.yhy.evtor.annotation.Subscribe;
@@ -30,8 +21,6 @@ import com.yhy.mz.tv.model.ems.Chan;
 import com.yhy.mz.tv.parser.Parser;
 import com.yhy.mz.tv.parser.ParserEngine;
 import com.yhy.mz.tv.utils.LogUtils;
-import com.yhy.mz.tv.utils.ViewUtils;
-import com.yhy.mz.tv.widget.SilenceTimeBar;
 import com.yhy.mz.tv.widget.web.ParserWebView;
 import com.yhy.mz.tv.widget.web.ParserWebViewDefault;
 import com.yhy.mz.tv.widget.web.ParserWebViewX5;
@@ -40,6 +29,7 @@ import com.yhy.router.annotation.Autowired;
 import com.yhy.router.annotation.Router;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +40,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import tv.danmaku.ijk.media.exo2.Exo2PlayerManager;
 
 /**
  * 详情页
@@ -93,15 +85,7 @@ public class DetailActivity extends BaseActivity {
 
     private Timer mProgressTimer;
 
-    private StyledPlayerView pvPlayer;
-    private ExoPlayer mExoPlayer;
-    private AppCompatTextView tvParsingLog;
-    private ProgressBar pbLoading;
-
     private boolean mIsFullScreen;
-    private ConstraintLayout clPlayerContainer;
-    private SilenceTimeBar tbProgressBottom;
-
 
     private StandardGSYVideoPlayer vvPlayer;
 
@@ -114,25 +98,7 @@ public class DetailActivity extends BaseActivity {
     protected void initView() {
         Evtor.instance.register(this);
 
-        clPlayerContainer = $(R.id.cl_player_container);
-        pvPlayer = $(R.id.pv_player);
-        tvParsingLog = $(R.id.tv_parsing_log);
-        pbLoading = $(R.id.pb_loading);
-        tbProgressBottom = $(R.id.tb_progress);
-
-        // 创建一个播放器
-        mExoPlayer = new ExoPlayer.Builder(this).build();
-        pvPlayer.setUseController(false);
-        pvPlayer.setShowBuffering(StyledPlayerView.SHOW_BUFFERING_NEVER);
-        pvPlayer.setPlayer(mExoPlayer);// 将播放器绑定到播放器视图上
-        mExoPlayer.setPlayWhenReady(true);// 设置播放器在准备好后开始播放
-        mExoPlayer.setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);// 设置播放器重复播放
-
         vvPlayer = $(R.id.vv_player);
-        //IjkPlayerSetting setting = IjkPlayerSetting.getDefault();
-        //setting.renderViewType = IjkPlayerSetting.RenderViewType.SURFACE_VIEW;
-        //setting.isUsingOpenSLES = false;
-        //vvPlayer.init(setting);
         vvPlayer.getTitleTextView().setVisibility(View.GONE);
         vvPlayer.getBackButton().setVisibility(View.GONE);
 
@@ -173,67 +139,32 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        mExoPlayer.addListener(new Player.Listener() {
+        mProgressTimer.schedule(new TimerTask() {
             @Override
-            public void onIsLoadingChanged(boolean isLoading) {
-                if (isLoading) {
-                    // 加载中
-                    LogUtils.iTag(TAG, "加载中");
-                    return;
-                }
+            public void run() {
+                runOnUiThread(() -> {
+                    long position = vvPlayer.getCurrentPlayer().getCurrentPositionWhenPlaying();
+                    if (position > 0 && null != mVideo) {
+                        KV.instance.kv().putLong(mVideo.pageUrl, position);
+                        LogUtils.iTag(TAG, "position = " + position);
+                    }
+                });
+            }
+        }, 0, 1);
 
-                LogUtils.iTag(TAG, "加载完成");
+        vvPlayer.setVideoAllCallBack(new GSYSampleCallBack() {
+            @Override
+            public void onPrepared(String url, Object... objects) {
+                super.onPrepared(url, objects);
+                vvPlayer.post(() -> {
+                    //vvPlayer.getCurrentPlayer().setPlayPosition((int) getPosition());
+                });
             }
 
             @Override
-            public void onPlaybackStateChanged(int state) {
-                switch (state) {
-                    case Player.STATE_BUFFERING:
-                        // 缓冲中
-                        LogUtils.iTag(TAG, "缓冲中");
-                        pbLoading.setVisibility(View.VISIBLE);
-                        break;
-                    case Player.STATE_READY:
-                        // 准备完成
-                        LogUtils.iTag(TAG, "准备完成");
-                        tvParsingLog.setVisibility(View.GONE);
-                        tbProgressBottom.setVisibility(View.VISIBLE);
-                        tbProgressBottom.setDuration(mExoPlayer.getDuration());
-                        pbLoading.setVisibility(View.GONE);
-                        break;
-                    case Player.STATE_ENDED:
-                        // 播放完成
-                        LogUtils.iTag(TAG, "播放完成");
-                        break;
-                    case Player.STATE_IDLE:
-                        // 播放器已卸载
-                        break;
-                }
-            }
-
-            @Override
-            public void onIsPlayingChanged(boolean isPlaying) {
-                if (isPlaying) {
-                    LogUtils.iTag(TAG, "正在播放");
-                    return;
-                }
-
-                // 未播放
-                LogUtils.iTag(TAG, "停止中");
-            }
-
-            @Override
-            public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
-                if (events.contains(Player.EVENT_IS_PLAYING_CHANGED)) {
-                    long position = player.getCurrentPosition();
-                    LogUtils.iTag(TAG, "播放状态改变了", position);
-                }
-            }
-
-            @Override
-            public void onPlayerError(@NonNull PlaybackException error) {
-                LogUtils.eTag(TAG, "出错啦", error.getLocalizedMessage());
-                pbLoading.setVisibility(View.VISIBLE);
+            public void onPlayError(String url, Object... objects) {
+                super.onPlayError(url, objects);
+                LogUtils.eTag(TAG, "出错啦", Arrays.toString(objects));
                 // 播放出错啦，多半是视频源解析出错，或者解析站的 Token 过期之类的，需要重新解析或者换个源即可
                 // 播放错误次数超过 x 次的解析器自动进入黑名单，下一次解析将其直接失效
                 int errorCount = Optional.ofNullable(mParserErrorCountMap.getOrDefault(mParser, 1)).orElse(1);
@@ -245,32 +176,6 @@ public class DetailActivity extends BaseActivity {
                     //LogUtils.iTag(TAG, "解析器【" + mParser.prs().getName() + "】播放出错次数：" + errorCount);
                     mParserErrorCountMap.put(mParser, errorCount);
                 }
-
-                //startParsing();
-            }
-        });
-
-        mProgressTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(() -> {
-                    long position = mExoPlayer.getCurrentPosition();
-                    if (position > 0 && null != mVideo) {
-                        tbProgressBottom.setPosition(position);
-                        tbProgressBottom.setBufferedPosition(mExoPlayer.getBufferedPosition());
-                        KV.instance.kv().putLong(mVideo.pageUrl, position);
-                    }
-                });
-            }
-        }, 0, 1);
-
-        vvPlayer.setVideoAllCallBack(new GSYSampleCallBack() {
-            @Override
-            public void onPrepared(String url, Object... objects) {
-                super.onPrepared(url, objects);
-
-                // 设置进度
-                vvPlayer.post(() -> vvPlayer.seekTo(getPosition()));
             }
         });
     }
@@ -281,8 +186,7 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (mIsFullScreen) {
-            toggleScreen(false);
+        if (GSYVideoManager.backFromWindowFull(this)) {
             return;
         }
         super.onBackPressed();
@@ -290,28 +194,18 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     protected void onPause() {
-        if (null != mExoPlayer) {
-            mExoPlayer.pause();
-        }
         GSYVideoManager.onPause();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        if (null != mExoPlayer) {
-            mExoPlayer.play();
-        }
         GSYVideoManager.onResume();
         super.onResume();
     }
 
     @Override
     protected void onDestroy() {
-        if (null != mExoPlayer) {
-            mExoPlayer.stop();
-            mExoPlayer.release();
-        }
         GSYVideoManager.releaseAllVideos();
 
         if (null != mProgressTimer) {
@@ -333,7 +227,6 @@ public class DetailActivity extends BaseActivity {
     @Subscribe("parsingLog")
     public void parsingLog(String tag, String parserName, String url) {
         LogUtils.iTag(tag, parserName, url);
-        tvParsingLog.setText(parserName + "：" + url);
     }
 
     private void startParsing() {
@@ -357,9 +250,6 @@ public class DetailActivity extends BaseActivity {
         });
 
         mWvList.forEach(it -> mParserService.execute(it::start));
-
-        tvParsingLog.setVisibility(View.VISIBLE);
-        tbProgressBottom.setVisibility(View.GONE);
     }
 
     private void stopParsing(boolean destroy) {
@@ -374,71 +264,29 @@ public class DetailActivity extends BaseActivity {
     }
 
     private void play(Parser parser, String url) {
-        String mimeType = parser.mimeType(mChan);
-        MediaItem mMediaItem = new MediaItem.Builder()
-            .setUri(url)
-            .setMimeType(mimeType)
-            .build();
-        long position = KV.instance.kv().getLong(mVideo.pageUrl, 0);
-        mExoPlayer.setMediaItem(mMediaItem, position);
-        mExoPlayer.prepare();
-        mExoPlayer.play();
+        vvPlayer.release();
 
-        tbProgressBottom.setBufferedPosition(mExoPlayer.getBufferedPosition());
-        tbProgressBottom.setPosition(position);
-        tbProgressBottom.hideScrubber(true);
+        String mimeType = parser.mimeType(mChan);
+        if (MimeTypes.APPLICATION_M3U8.equals(mimeType)) {
+            // m3u8 格式，切换成 IJK 播放器
+            PlayerFactory.setPlayManager(IjkPlayerManager.class); // ijk 模式
+        } else {
+            // 其他格式，使用 EXO
+            PlayerFactory.setPlayManager(Exo2PlayerManager.class); // EXO 模式
+        }
+
+        long position = getPosition();
+        LogUtils.iTag(TAG, "setSeekOnStart", position);
 
         vvPlayer.setUp(url, false, "");
+        vvPlayer.setPlayPosition((int) position);
+        //vvPlayer.setSeekOnStart(position);
+        //vvPlayer.getGSYVideoManager().seekTo(position);
         vvPlayer.startAfterPrepared();
         vvPlayer.startPlayLogic();
-        //bsyBuilder(url).build(vvPlayer);
-        //vvPlayer.setVideoPath(url);
-        //vvPlayer.seekAndStart(position);
-
-        //pvPlayer.postDelayed(() -> toggleScreen(true), 3000);
     }
 
     private long getPosition() {
         return KV.instance.kv().getLong(mVideo.pageUrl, 0);
-    }
-
-    //private GSYVideoOptionBuilder bsyBuilder(String url) {
-    //    return new GSYVideoOptionBuilder()
-    //        .setUrl(url)
-    //        .setCacheWithPlay(true)
-    //        .setVideoTitle(" ")
-    //        .setIsTouchWiget(true)
-    //        .setRotateViewAuto(false)
-    //        .setLockLand(false)
-    //        .setShowFullAnimation(false)
-    //        .setNeedLockFull(true)
-    //        .setSeekRatio(1)
-    //        .setVideoAllCallBack(new GSYSampleCallBack() {
-    //            @Override
-    //            public void onPrepared(String url, Object... objects) {
-    //                super.onPrepared(url, objects);
-    //                vvPlayer.startPlayLogic();
-    //            }
-    //        });
-    //}
-
-    private void toggleScreen(boolean fullscreen) {
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
-        ViewGroup.LayoutParams params = clPlayerContainer.getLayoutParams();
-        if (!fullscreen) {
-            params.width = ViewUtils.dp2px(160);
-            params.height = ViewUtils.dp2px(90);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        } else {
-            params.width = params.MATCH_PARENT;
-            params.height = params.MATCH_PARENT;
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        }
-        clPlayerContainer.setLayoutParams(params);
-        clPlayerContainer.setKeepScreenOn(fullscreen);
-        mIsFullScreen = fullscreen;
     }
 }
