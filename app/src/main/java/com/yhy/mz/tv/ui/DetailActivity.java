@@ -14,11 +14,12 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.lodz.android.mmsplayer.ijk.setting.IjkPlayerSetting;
-import com.lodz.android.mmsplayer.impl.MmsVideoView;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
+import com.shuyu.gsyvideoplayer.GSYVideoManager;
+import com.shuyu.gsyvideoplayer.listener.GSYSampleCallBack;
+import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 import com.yhy.evtor.Evtor;
 import com.yhy.evtor.annotation.Subscribe;
 import com.yhy.mz.tv.R;
@@ -49,8 +50,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 /**
  * 详情页
@@ -104,7 +103,7 @@ public class DetailActivity extends BaseActivity {
     private SilenceTimeBar tbProgressBottom;
 
 
-    private MmsVideoView vvPlayer;
+    private StandardGSYVideoPlayer vvPlayer;
 
     @Override
     protected int layout() {
@@ -130,10 +129,12 @@ public class DetailActivity extends BaseActivity {
         mExoPlayer.setRepeatMode(ExoPlayer.REPEAT_MODE_OFF);// 设置播放器重复播放
 
         vvPlayer = $(R.id.vv_player);
-        IjkPlayerSetting setting = IjkPlayerSetting.getDefault();
-        setting.renderViewType = IjkPlayerSetting.RenderViewType.SURFACE_VIEW;
-        setting.isUsingOpenSLES = false;
-        vvPlayer.init(setting);
+        //IjkPlayerSetting setting = IjkPlayerSetting.getDefault();
+        //setting.renderViewType = IjkPlayerSetting.RenderViewType.SURFACE_VIEW;
+        //setting.isUsingOpenSLES = false;
+        //vvPlayer.init(setting);
+        vvPlayer.getTitleTextView().setVisibility(View.GONE);
+        vvPlayer.getBackButton().setVisibility(View.GONE);
 
         mProgressTimer = new Timer();
     }
@@ -263,37 +264,13 @@ public class DetailActivity extends BaseActivity {
             }
         }, 0, 1);
 
-        vvPlayer.setListener(new MmsVideoView.Listener() {
+        vvPlayer.setVideoAllCallBack(new GSYSampleCallBack() {
             @Override
-            public void onPrepared() {
-                LogUtils.iTag(TAG, "IjkPlayer", "已就绪");
-                // 准备就绪就自动开始播放
-                //vvPlayer.start();
-            }
+            public void onPrepared(String url, Object... objects) {
+                super.onPrepared(url, objects);
 
-            @Override
-            public void onBufferingStart() {
-                LogUtils.iTag(TAG, "IjkPlayer", "开始缓冲");
-            }
-
-            @Override
-            public void onBufferingEnd() {
-                LogUtils.iTag(TAG, "IjkPlayer", "缓冲完成");
-            }
-
-            @Override
-            public void onCompletion() {
-                LogUtils.iTag(TAG, "IjkPlayer", "播放完成");
-            }
-
-            @Override
-            public void onError(int errorType, String msg) {
-                LogUtils.eTag(TAG, "IjkPlayer", "播放异常", errorType, msg);
-            }
-
-            @Override
-            public void onMediaPlayerCreated(@NonNull IMediaPlayer mediaPlayer) {
-                LogUtils.iTag(TAG, "IjkPlayer", "播放器创建完成");
+                // 设置进度
+                vvPlayer.post(() -> vvPlayer.seekTo(getPosition()));
             }
         });
     }
@@ -316,6 +293,7 @@ public class DetailActivity extends BaseActivity {
         if (null != mExoPlayer) {
             mExoPlayer.pause();
         }
+        GSYVideoManager.onPause();
         super.onPause();
     }
 
@@ -324,6 +302,7 @@ public class DetailActivity extends BaseActivity {
         if (null != mExoPlayer) {
             mExoPlayer.play();
         }
+        GSYVideoManager.onResume();
         super.onResume();
     }
 
@@ -333,6 +312,8 @@ public class DetailActivity extends BaseActivity {
             mExoPlayer.stop();
             mExoPlayer.release();
         }
+        GSYVideoManager.releaseAllVideos();
+
         if (null != mProgressTimer) {
             mProgressTimer.cancel();
         }
@@ -395,9 +376,9 @@ public class DetailActivity extends BaseActivity {
     private void play(Parser parser, String url) {
         String mimeType = parser.mimeType(mChan);
         MediaItem mMediaItem = new MediaItem.Builder()
-                .setUri(url)
-                .setMimeType(mimeType)
-                .build();
+            .setUri(url)
+            .setMimeType(mimeType)
+            .build();
         long position = KV.instance.kv().getLong(mVideo.pageUrl, 0);
         mExoPlayer.setMediaItem(mMediaItem, position);
         mExoPlayer.prepare();
@@ -407,11 +388,39 @@ public class DetailActivity extends BaseActivity {
         tbProgressBottom.setPosition(position);
         tbProgressBottom.hideScrubber(true);
 
-        vvPlayer.setVideoPath(url);
-        vvPlayer.seekAndStart(position);
+        vvPlayer.setUp(url, false, "");
+        vvPlayer.startAfterPrepared();
+        vvPlayer.startPlayLogic();
+        //bsyBuilder(url).build(vvPlayer);
+        //vvPlayer.setVideoPath(url);
+        //vvPlayer.seekAndStart(position);
 
         //pvPlayer.postDelayed(() -> toggleScreen(true), 3000);
     }
+
+    private long getPosition() {
+        return KV.instance.kv().getLong(mVideo.pageUrl, 0);
+    }
+
+    //private GSYVideoOptionBuilder bsyBuilder(String url) {
+    //    return new GSYVideoOptionBuilder()
+    //        .setUrl(url)
+    //        .setCacheWithPlay(true)
+    //        .setVideoTitle(" ")
+    //        .setIsTouchWiget(true)
+    //        .setRotateViewAuto(false)
+    //        .setLockLand(false)
+    //        .setShowFullAnimation(false)
+    //        .setNeedLockFull(true)
+    //        .setSeekRatio(1)
+    //        .setVideoAllCallBack(new GSYSampleCallBack() {
+    //            @Override
+    //            public void onPrepared(String url, Object... objects) {
+    //                super.onPrepared(url, objects);
+    //                vvPlayer.startPlayLogic();
+    //            }
+    //        });
+    //}
 
     private void toggleScreen(boolean fullscreen) {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);

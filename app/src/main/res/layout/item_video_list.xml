@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorWhite"
-                android:textSize="5sp"
+                android:textSize="14sp"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:gravity="center"
@@ -44,13 +44,14 @@
 
     <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_score"
-            android:layout_width="10dp"
-            android:layout_height="6dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textColor="@color/colorWhite"
             android:background="@color/colorGreen"
-            android:textSize="4sp"
-            android:gravity="center"
+            android:textSize="12sp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toEndOf="parent                                                                                                                                                                                                                                                                                                                                                                                                                                            "
             tools:text="8.8" />
 </androidx.constraintlayout.widget.ConstraintLayout>

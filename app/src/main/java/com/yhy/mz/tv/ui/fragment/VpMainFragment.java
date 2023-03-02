@@ -173,8 +173,8 @@ public class VpMainFragment extends BaseLazyLoadFragment {
         hgContent = mRootView.findViewById(R.id.hg_content);
         hgContent.setTabView(mActivity.getHgTitle());
         hgContent.setNumColumns(8);
-        hgContent.setHorizontalSpacing(ViewUtils.dp2px(5));
-        hgContent.setVerticalSpacing(ViewUtils.dp2px(1));
+        hgContent.setHorizontalSpacing(ViewUtils.dp2px(8));
+        hgContent.setVerticalSpacing(ViewUtils.dp2px(4));
         mPresenter = new PageVideoPresenter();
         mAdapter = new ArrayObjectAdapter(mPresenter);
         ItemBridgeAdapter itemBridgeAdapter = new ItemBridgeAdapter(mAdapter);

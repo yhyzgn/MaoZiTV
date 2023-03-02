@@ -38,23 +38,23 @@
                 <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="14dp"
+                        android:paddingStart="16dp"
                         android:paddingTop="2dp"
                         android:paddingEnd="6dp"
                         android:paddingBottom="2dp"
                         android:gravity="center"
                         android:text="搜索"
                         android:textColor="@color/colorWhite"
-                        android:textSize="5sp"
+                        android:textSize="14sp"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="6dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_marginStart="4dp"
                         android:src="@mipmap/ic_search"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -66,7 +66,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/selector_focus_bg_corner15_without_default_bg"
-                    android:layout_marginStart="4dp"
+                    android:layout_marginStart="8dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
@@ -77,23 +77,23 @@
                 <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="14dp"
+                        android:paddingStart="16dp"
                         android:paddingTop="2dp"
                         android:paddingEnd="6dp"
                         android:paddingBottom="2dp"
                         android:gravity="center"
                         android:text="历史记录"
                         android:textColor="@color/colorWhite"
-                        android:textSize="5sp"
+                        android:textSize="14sp"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="6dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_marginStart="4dp"
                         android:src="@mipmap/ic_history"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -105,7 +105,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/selector_focus_bg_corner15_without_default_bg"
-                    android:layout_marginStart="4dp"
+                    android:layout_marginStart="8dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
@@ -116,23 +116,23 @@
                 <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="14dp"
+                        android:paddingStart="16dp"
                         android:paddingTop="2dp"
                         android:paddingEnd="6dp"
                         android:paddingBottom="2dp"
                         android:gravity="center"
                         android:text="收藏夹"
                         android:textColor="@color/colorWhite"
-                        android:textSize="5sp"
+                        android:textSize="14sp"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="6dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_marginStart="4dp"
                         android:src="@mipmap/ic_favor"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -144,7 +144,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/selector_focus_bg_corner15_without_default_bg"
-                    android:layout_marginStart="4dp"
+                    android:layout_marginStart="8dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
@@ -155,23 +155,23 @@
                 <androidx.appcompat.widget.AppCompatTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:paddingStart="14dp"
+                        android:paddingStart="16dp"
                         android:paddingTop="2dp"
                         android:paddingEnd="6dp"
                         android:paddingBottom="2dp"
                         android:gravity="center"
                         android:text="设置"
                         android:textColor="@color/colorWhite"
-                        android:textSize="5sp"
+                        android:textSize="14sp"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatImageView
-                        android:layout_width="6dp"
-                        android:layout_height="6dp"
-                        android:layout_marginStart="5dp"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_marginStart="4dp"
                         android:src="@mipmap/ic_settings"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -190,27 +190,27 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/iv_net"
-                    android:layout_width="8dp"
-                    android:layout_height="10dp"
+                    android:layout_width="16dp"
+                    android:layout_height="20dp"
                     android:scaleType="centerInside" />
 
             <TextClock
                     android:id="@+id/tp_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
                     android:gravity="center"
                     android:format12Hour="hh:mm:ss"
                     android:format24Hour="hh:mm:ss"
                     android:textColor="@color/colorWhite"
-                    android:textSize="5sp"
-                    android:layout_marginStart="4dp"
+                    android:textSize="14sp"
+                    android:layout_marginStart="8dp"
                     android:theme="@style/ClockTimePicker" />
 
             <View
                     android:layout_width="1px"
-                    android:layout_height="6dp"
+                    android:layout_height="12dp"
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
                     android:background="@color/colorLine" />
@@ -218,19 +218,19 @@
             <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingTop="2dp"
-                    android:paddingBottom="2dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"
                     android:gravity="center"
                     android:text="猫子TV 1.0.0"
                     android:textColor="@color/colorWhite"
-                    android:textSize="5sp" />
+                    android:textSize="14sp" />
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.yhy.mz.tv.widget.TabHorizontalGridView
             android:id="@+id/hg_title"
             android:layout_width="match_parent"
-            android:layout_height="14dp"
+            android:layout_height="32dp"
             android:layout_marginTop="2dp"
             android:clipChildren="false"
             android:clipToPadding="false"

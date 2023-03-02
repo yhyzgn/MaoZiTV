@@ -130,7 +130,7 @@ public class MainActivity extends BaseActivity implements ViewTreeObserver.OnGlo
         hgTitle = $(R.id.hg_title);
         vpContent = $(R.id.vp_content);
 
-        hgTitle.setHorizontalSpacing(ViewUtils.dp2px(4));
+        hgTitle.setHorizontalSpacing(ViewUtils.dp2px(8));
         mHgTopAdapter = new ArrayObjectAdapter(new TabChanPresenter());
         ItemBridgeAdapter tempAdapter = new ItemBridgeAdapter(mHgTopAdapter);
         hgTitle.setAdapter(tempAdapter);

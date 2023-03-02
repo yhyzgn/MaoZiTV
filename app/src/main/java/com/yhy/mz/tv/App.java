@@ -14,6 +14,7 @@ import com.lzy.okgo.cache.CacheEntity;
 import com.lzy.okgo.cache.CacheMode;
 import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.lzy.okgo.model.HttpHeaders;
+import com.shuyu.gsyvideoplayer.cache.CacheFactory;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.tencent.smtt.export.external.TbsCoreSettings;
@@ -43,6 +44,7 @@ import java.util.logging.Level;
 import io.fastkv.FastKV;
 import io.fastkv.FastKVConfig;
 import okhttp3.OkHttpClient;
+import tv.danmaku.ijk.media.exo2.ExoPlayerCacheManager;
 
 /**
  * 应用
@@ -224,7 +226,7 @@ public class App extends MultiDexApplication {
 
         // 播放器
 //        PlayerFactory.setPlayManager(Exo2PlayerManager.class);
-//        CacheFactory.setCacheManager(ExoPlayerCacheManager.class);
+        CacheFactory.setCacheManager(ExoPlayerCacheManager.class);
     }
 
     private void initOkGo() {

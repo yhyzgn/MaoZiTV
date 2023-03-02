@@ -34,7 +34,7 @@ public class ParserEngine {
         mParserList.add(new JsonPlayerParser());
         mParserList.add(new OkParser());
         mParserList.add(new PanGuParser());
-        mParserList.add(new AiDouErParser());
+        //mParserList.add(new AiDouErParser());
         mParserList.add(new XiaMiParser());
         mParserList.add(new YeMuParser());
         mParserList.add(new DV4KParser());

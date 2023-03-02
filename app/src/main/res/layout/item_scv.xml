@@ -9,8 +9,8 @@
         android:focusableInTouchMode="true"
         android:gravity="center"
         android:textColor="@color/colorWhite"
-        android:textSize="5sp"
-        android:paddingStart="4dp"
+        android:textSize="14sp"
+        android:paddingStart="6dp"
         android:paddingTop="2dp"
         android:paddingBottom="2dp"
-        android:paddingEnd="4dp" />
+        android:paddingEnd="6dp" />
